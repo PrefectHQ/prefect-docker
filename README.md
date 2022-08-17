@@ -18,11 +18,11 @@
 
 ## Welcome!
 
-Prefect integrations for interacting with prefect-docker.
+Prefect integrations for interacting with Docker.
 
 The tasks within this collection were created by a code generator using the service's OpenAPI spec.
 
-The service's REST API documentation can be found [here](replace_this_with_link_to_api_docs).
+The service's REST API documentation can be found [here](https://docs.docker.com/engine/api/v1.41/).
 
 ## Getting Started
 
