@@ -42,22 +42,19 @@ Install `prefect-docker` with `pip`:
 pip install prefect-docker
 ```
 
-### Write and run a flow
+### List containers
 
 ```python
 from prefect import flow
-from prefect_docker.tasks import (
-    goodbye_prefect_docker,
-    hello_prefect_docker,
-)
-
+from prefect_docker import DockerCredentials
+from prefect_docker.containers import container_list
 
 @flow
-def example_flow():
-    hello_prefect_docker
-    goodbye_prefect_docker
+def list_containers_flow():
+    credentials = DockerCredentials()
+    return container_list(credentials)
 
-example_flow()
+list_containers_flow()
 ```
 
 ## Resources

@@ -52,7 +52,7 @@ populate_collection_repo(
     overwrite=overwrite,
     preprocess_fn=preprocess_fn,
     repo_directory=REPO_DIRECTORY,
-    base_url="unix:///var/run/docker.sock"
+    base_url="unix:///var/run/docker.sock",
     regenerate_module_files=False,
-    regenerate_test_files=False
+    regenerate_test_files=False,
 )
