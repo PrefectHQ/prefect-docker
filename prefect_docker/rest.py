@@ -92,18 +92,16 @@ async def execute_endpoint(
         Queries the weather at an airport.
         ```python
         from prefect import flow
-        from prefect_aviationapi import AviationAPICredentials
-        from prefect_aviationapi.rest import execute_endpoint
+        from prefect_docker import DockerCredentials
+        from prefect_docker.rest import execute_endpoint
 
-        @flow()
-        def example_execute_endpoint_flow():
-            endpoint = "/weather/metar"
-            aviationapi_credentials = AviationAPICredentials()
-            params = dict(apt="KORD,KSEA")
-            response = execute_endpoint(endpoint, aviationapi_credentials, params=params)
+        @flow
+        def list_containers_flow():
+            credentials = DockerCredentials()
+            response = execute_endpoint("/containers/json", credentials)
             return response.json()
 
-        example_execute_endpoint_flow()
+        list_containers_flow()
         ```
     """
     if isinstance(http_method, HTTPMethod):
