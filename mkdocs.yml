@@ -68,5 +68,4 @@ nav:
     - Session: session.md
     - Swarm: swarm.md
     - System: system.md
-    - Version: version.md
-    - Volumes: volumes.md
+    

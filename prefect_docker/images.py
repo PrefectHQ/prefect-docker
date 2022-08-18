@@ -8,14 +8,13 @@ Docker images
 # is outdated, rerun scripts/generate.py.
 
 # OpenAPI spec: v1.41.yaml
-# Updated at: 2022-08-17T00:00:42.725406
+# Updated at: 2022-08-18T00:04:16.548824
 
 from typing import TYPE_CHECKING, Any, Dict, List, Union  # noqa
 
-import httpx
 from prefect import task
 
-from prefect_docker.rest import HTTPMethod, execute_endpoint
+from prefect_docker.rest import HTTPMethod, _unpack_contents, execute_endpoint
 
 if TYPE_CHECKING:
     from prefect_docker import DockerCredentials
@@ -74,29 +73,15 @@ async def image_list(
         "digests": digests,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.GET,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.GET,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
 
 
 @task
@@ -184,29 +169,15 @@ async def image_create(
         "platform": platform,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.POST,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.POST,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
 
 
 @task
@@ -247,29 +218,15 @@ async def image_inspect(
         "name": name,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.GET,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.GET,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
 
 
 @task
@@ -310,29 +267,15 @@ async def image_history(
         "name": name,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.GET,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.GET,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
 
 
 @task
@@ -386,29 +329,15 @@ async def image_push(
         "x_registry_auth": x_registry_auth,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.POST,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.POST,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
 
 
 @task
@@ -461,29 +390,15 @@ async def image_tag(
         "tag": tag,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.POST,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.POST,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
 
 
 @task
@@ -537,29 +452,15 @@ async def image_delete(
         "noprune": noprune,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.DELETE,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.DELETE,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
 
 
 @task
@@ -611,29 +512,15 @@ async def image_search(
         "filters": filters,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.GET,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.GET,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
 
 
 @task
@@ -684,29 +571,15 @@ async def image_prune(
         "filters": filters,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.POST,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.POST,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
 
 
 @task
@@ -760,29 +633,15 @@ async def image_get(
         "name": name,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.GET,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.GET,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
 
 
 @task
@@ -829,29 +688,15 @@ async def image_get_all(
         "names": names,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.GET,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.GET,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
 
 
 @task
@@ -897,26 +742,12 @@ async def image_load(
         "quiet": quiet,
     }
 
-    try:
-        response = await execute_endpoint.fn(
-            endpoint,
-            docker_credentials,
-            http_method=HTTPMethod.POST,
-            params=params,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        helpful_error_response = (responses or {}).get(response.status_code, "")
-        try:
-            helpful_error_response += f"JSON response: {response.json()}"
-        except Exception:
-            pass
-        if helpful_error_response:
-            raise httpx.HTTPStatusError(
-                helpful_error_response, request=exc.request, response=exc.response
-            ) from exc
-        else:
-            raise
+    response = await execute_endpoint.fn(
+        endpoint,
+        docker_credentials,
+        http_method=HTTPMethod.POST,
+        params=params,
+    )
 
-    result = response.json()
-    return result
+    contents = _unpack_contents(response, responses)
+    return contents
