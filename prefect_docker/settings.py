@@ -1,8 +1,7 @@
-"""This is an example blocks module"""
-from typing import Optional, Dict, Any
+"""Module containing docker settings."""
+from typing import Any, Dict, Optional
 
 import docker
-
 from prefect.blocks.core import Block
 from pydantic import Field
 
@@ -26,33 +25,32 @@ class DockerSettings(Block):
     """
 
     _block_type_name = "Docker Settings"
-    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250" # noqa
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250"  # noqa
 
     base_url: Optional[str] = Field(
-        default=None,
-        description="URL to the Docker server.", title="Base URL")
-    version: str = Field(
-        default="auto",
-        description="The version of the API to use")
+        default=None, description="URL to the Docker server.", title="Base URL"
+    )
+    version: str = Field(default="auto", description="The version of the API to use")
     timeout: Optional[int] = Field(
-        default=None,
-        description="Default timeout for API calls, in seconds.")
+        default=None, description="Default timeout for API calls, in seconds."
+    )
     max_pool_size: Optional[int] = Field(
         default=None,
-        description="The maximum number of connections to save in the pool.")
+        description="The maximum number of connections to save in the pool.",
+    )
     credstore_env: Dict[str, Any] = Field(
         default_factory=dict,
         description=(
             "Override environment variables when calling "
-            "the credential store process"
-        )
+            "the credential store process."
+        ),
     )
     client_kwargs: Dict[str, Any] = Field(
         default_factory=dict,
         description=(
-            "Override environment variables when calling "
-            "the credential store process"
-        )
+            "Additional keyword arguments to pass to "
+            "`docker.from_env()` or `DockerClient`."
+        ),
     )
 
     def get_client(self) -> docker.DockerClient:
@@ -64,7 +62,7 @@ class DockerSettings(Block):
             "timeout": self.timeout,
             "max_pool_size": self.max_pool_size,
             "credstore_env": self.credstore_env,
-            **self.client_kwargs
+            **self.client_kwargs,
         }
         if self.base_url is None:
             client = docker.from_env(**client_kwargs)
