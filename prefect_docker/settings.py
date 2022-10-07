@@ -69,5 +69,5 @@ class DockerSettings(Block):
         if self.base_url is None:
             client = docker.from_env(**client_kwargs)
         else:
-            client = docker.DockerClient(**client_kwargs)
+            client = docker.DockerClient(base_url=self.base_url, **client_kwargs)
         return client
