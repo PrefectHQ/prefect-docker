@@ -26,11 +26,11 @@ class DockerSettings(Block):
 
     _block_type_name = "Docker Settings"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250"  # noqa
-    _description = "Store settings for a interacting with a Docker host."
+    _description = "Store settings for interacting with a Docker host."
 
     base_url: Optional[str] = Field(
         default=None,
-        description="URL to the Docker server.",
+        description="URL to the Docker host.",
         title="Base URL",
         example="unix:///var/run/docker.sock",
     )
