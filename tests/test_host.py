@@ -31,7 +31,6 @@ def test_docker_host_get_client(mock_docker: MagicMock):
         version="1.35",
         timeout=None,
         max_pool_size=8,
-        credstore_env={},
         tls=True,
     )
 
