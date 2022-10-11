@@ -1,4 +1,4 @@
-"""Module containing docker settings."""
+"""Module containing Docker host settings."""
 from typing import Any, Dict, Optional
 
 import docker
