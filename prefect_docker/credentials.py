@@ -22,7 +22,7 @@ class DockerRegistryCredentials(Block):
     registry_url: str = Field(
         default=...,
         description=(
-            'The URL to the registry. Generally, "http" or "https" can be omitted.',
+            'The URL to the registry. Generally, "http" or "https" can be omitted.'
         ),
     )
     reauth: bool = Field(
