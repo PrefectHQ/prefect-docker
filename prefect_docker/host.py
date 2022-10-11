@@ -51,7 +51,7 @@ class DockerHost(Block):
 
     def get_client(self) -> docker.DockerClient:
         """
-        Gets a Docker client to communicate with a Docker server.
+        Gets a Docker client to communicate with a Docker host.
         """
         client_kwargs = {
             "version": self.version,

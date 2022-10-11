@@ -1,16 +1,6 @@
 from unittest.mock import MagicMock
 
-import pytest
-
 from prefect_docker.host import DockerHost
-
-
-@pytest.fixture
-def mock_docker(monkeypatch) -> MagicMock:
-    docker = MagicMock(DockerClient=MagicMock())
-    docker.from_env.side_effect = lambda **kwargs: kwargs
-    monkeypatch.setattr("prefect_docker.host.docker", docker)
-    return docker
 
 
 def test_docker_host_get_client(mock_docker: MagicMock):
