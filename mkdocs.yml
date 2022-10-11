@@ -49,3 +49,4 @@ plugins:
 nav:
     - Home: index.md
     - Settings: settings.md
+    - Containers: containers.md

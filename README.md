@@ -41,27 +41,28 @@ pip install prefect-docker
 Then, register to [view the block](https://orion-docs.prefect.io/ui/blocks/) on Prefect Cloud:
 
 ```bash
-prefect block register -m prefect_docker.credentials
+prefect block register -m prefect_docker
 ```
 
 Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
 
-### Write and run a flow
+### Create a Docker container
 
 ```python
 from prefect import flow
-from prefect_docker.tasks import (
-    goodbye_prefect_docker,
-    hello_prefect_docker,
-)
-
+from prefect_docker import DockerSettings
+from prefect_docker.container import create_docker_container
 
 @flow
-def example_flow():
-    hello_prefect_docker
-    goodbye_prefect_docker
+def create_docker_container_flow():
+    docker_settings = DockerSettings()
+    container = create_docker_container(
+        docker_settings=docker_settings,
+        image="prefecthq/prefect",
+        command="echo 'hello world!'"
+    )
 
-example_flow()
+create_docker_container_flow()
 ```
 
 ## Resources

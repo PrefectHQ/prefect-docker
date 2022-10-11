@@ -42,14 +42,6 @@ class DockerSettings(Block):
         default=None,
         description="The maximum number of connections to save in the pool.",
     )
-    credstore_env: Dict[str, Any] = Field(
-        default_factory=dict,
-        title="Credential Store Environment Variables",
-        description=(
-            "Override environment variables when calling "
-            "the credential store process."
-        ),
-    )
     client_kwargs: Dict[str, Any] = Field(
         default_factory=dict,
         title="Additional Configuration",
@@ -67,14 +59,12 @@ class DockerSettings(Block):
             "version": self.version,
             "timeout": self.timeout,
             "max_pool_size": self.max_pool_size,
-            "credstore_env": self.credstore_env,
             **self.client_kwargs,
         }
         client_kwargs = {
             key: value for key, value in client_kwargs.items() if value is not None
         }
         if self.base_url is None:
-            client_kwargs.pop("credstore_env")
             client = docker.from_env(**client_kwargs)
         else:
             client = docker.DockerClient(base_url=self.base_url, **client_kwargs)

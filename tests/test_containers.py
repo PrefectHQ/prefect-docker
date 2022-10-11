@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from prefect_docker.container import create_docker_container
+from prefect_docker.containers import create_docker_container
 
 
 def test_create_docker_container(mock_docker_settings: MagicMock):

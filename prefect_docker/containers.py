@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional, Union
 
-from docker.models.containers import Container
 from prefect import task
 
 from prefect_docker.settings import DockerSettings
@@ -16,7 +15,7 @@ def create_docker_container(
     name: Optional[str] = None,
     detach: Optional[bool] = None,
     **create_kwargs: Dict[str, Any]
-) -> Container:
+) -> int:
     """
     Create a container without starting it. Similar to docker create.
 
@@ -30,15 +29,29 @@ def create_docker_container(
             [`client.containers.create`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.create).
 
     Returns:
-        A Container object.
+        A Container's ID.
 
     Examples:
         Create a container with the Prefect image.
         ```
+        from prefect import flow
+        from prefect_docker import DockerSettings
+        from prefect_docker.container import create_docker_container
+
+        @flow
+        def create_docker_container_flow():
+            docker_settings = DockerSettings()
+            container = create_docker_container(
+                docker_settings=docker_settings,
+                image="prefecthq/prefect",
+                command="echo 'hello world!'"
+            )
+
+        create_docker_container_flow()
         ```
     """
     client = docker_settings.get_client()
     container = client.containers.create(
         image=image, command=command, name=name, detach=detach, **create_kwargs
     )
-    return container
+    return container.id
