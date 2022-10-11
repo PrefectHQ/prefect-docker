@@ -25,4 +25,8 @@ Released on ????? ?th, 20??.
 
 ### Added
 
-- `DockerHost` task - [#3](https://github.com/PrefectHQ/prefect-docker/pull/3)
+- `DockerSettings` block - [#3](https://github.com/PrefectHQ/prefect-docker/pull/3)
+
+### Changed
+
+- `DockerSettings` renamed to `DockerHost` - [#13](https://github.com/PrefectHQ/prefect-docker/pull/13)
