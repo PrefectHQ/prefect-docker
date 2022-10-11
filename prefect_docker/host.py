@@ -59,6 +59,9 @@ class DockerHost(Block):
             "max_pool_size": self.max_pool_size,
             **self.client_kwargs,
         }
+        client_kwargs = {
+            key: value for key, value in client_kwargs.items() if value is not None
+        }
         if self.base_url is None:
             client = docker.from_env(**client_kwargs)
         else:
