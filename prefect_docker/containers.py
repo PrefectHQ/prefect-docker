@@ -36,7 +36,7 @@ def create_docker_container(
         ```
         from prefect import flow
         from prefect_docker import DockerSettings
-        from prefect_docker.container import create_docker_container
+        from prefect_docker.containers import create_docker_container
 
         @flow
         def create_docker_container_flow():
