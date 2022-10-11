@@ -14,6 +14,6 @@ def test_create_docker_container(mock_docker_host: MagicMock):
         ports={"2222/tcp": 3333},
     )
     with disable_run_logger():
-        create_docker_container.fn(mock_docker_host, **create_kwargs)
+        create_docker_container.fn(docker_host=mock_docker_host, **create_kwargs)
     client = mock_docker_host.get_client()
     client.containers.create.assert_called_once_with(**create_kwargs)
