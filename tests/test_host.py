@@ -29,7 +29,6 @@ def test_docker_host_get_client(mock_docker: MagicMock):
     mock_docker.DockerClient.assert_called_once_with(
         base_url="unix:///var/run/docker.sock",
         version="1.35",
-        timeout=None,
         max_pool_size=8,
         tls=True,
     )
@@ -49,7 +48,6 @@ def test_docker_host_get_client_from_env(mock_docker: MagicMock):
     settings.get_client()
     mock_docker.from_env.assert_called_once_with(
         version="1.35",
-        timeout=None,
         max_pool_size=8,
         assert_hostname=True,
     )
