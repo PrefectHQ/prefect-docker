@@ -70,7 +70,11 @@ class DockerSettings(Block):
             "credstore_env": self.credstore_env,
             **self.client_kwargs,
         }
+        client_kwargs = {
+            key: value for key, value in client_kwargs.items() if value is not None
+        }
         if self.base_url is None:
+            client_kwargs.pop("credstore_env")
             client = docker.from_env(**client_kwargs)
         else:
             client = docker.DockerClient(base_url=self.base_url, **client_kwargs)

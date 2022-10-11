@@ -14,6 +14,7 @@ def create_docker_container(
     image: str,
     command: Optional[Union[str, List[str]]] = None,
     name: Optional[str] = None,
+    detach: Optional[bool] = None,
     **create_kwargs: Dict[str, Any]
 ) -> Container:
     """
@@ -24,14 +25,20 @@ def create_docker_container(
         image: The image to run.
         command: The command(s) to run in the container.
         name: The name for this container.
+        detach: Run container in the background.
         create_kwargs: Additional keyword arguments to pass to
             [`client.containers.create`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.create).
 
     Returns:
         A Container object.
+
+    Examples:
+        Create a container with the Prefect image.
+        ```
+        ```
     """
     client = docker_settings.get_client()
     container = client.containers.create(
-        image=image, command=command, name=name, **create_kwargs
+        image=image, command=command, name=name, detach=detach, **create_kwargs
     )
     return container

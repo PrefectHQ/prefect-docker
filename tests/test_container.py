@@ -8,6 +8,7 @@ def test_create_docker_container(mock_docker_settings: MagicMock):
         image="test_image",
         command="test_command",
         name="test_name",
+        detach=False,
         ports={"2222/tcp": 3333},
     )
     create_docker_container.fn(mock_docker_settings, **create_kwargs)
