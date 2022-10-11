@@ -19,6 +19,7 @@ def test_docker_credentials_get_client(mock_docker: MagicMock):
         version="1.35",
         max_pool_size=8,
         client_kwargs={"tls": True},
+        timeout=None,
     )
     settings = DockerSettings(**settings_kwargs)
     for key, val in settings_kwargs.items():
@@ -28,16 +29,17 @@ def test_docker_credentials_get_client(mock_docker: MagicMock):
     mock_docker.DockerClient.assert_called_once_with(
         base_url="unix:///var/run/docker.sock",
         version="1.35",
-        timeout=None,
         max_pool_size=8,
-        credstore_env={},
         tls=True,
     )
 
 
 def test_docker_credentials_get_client_from_env(mock_docker: MagicMock):
     settings_kwargs = dict(
-        version="1.35", max_pool_size=8, client_kwargs={"assert_hostname": True}
+        version="1.35",
+        max_pool_size=8,
+        client_kwargs={"assert_hostname": True},
+        timeout=None,
     )
     settings = DockerSettings(**settings_kwargs)
     for key, val in settings_kwargs.items():
@@ -46,8 +48,6 @@ def test_docker_credentials_get_client_from_env(mock_docker: MagicMock):
     settings.get_client()
     mock_docker.from_env.assert_called_once_with(
         version="1.35",
-        timeout=None,
         max_pool_size=8,
-        credstore_env={},
         assert_hostname=True,
     )
