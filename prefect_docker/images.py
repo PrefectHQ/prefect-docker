@@ -71,12 +71,10 @@ def pull_docker_image(
     }
 
     if docker_host is None:
-        logger.info("Creating a Docker client from the environment.")
         docker_host = DockerHost()
 
     client = docker_host.get_client()
     if docker_registry_credentials is not None:
-        logger.info("Authenticating with registry credentials.")
         docker_registry_credentials.login(client=client)
 
     logger.info(f"Pulling the {repository} image.")

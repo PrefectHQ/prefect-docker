@@ -2,6 +2,7 @@
 from typing import Any, Dict, Optional
 
 import docker
+from prefect import get_run_logger
 from prefect.blocks.core import Block
 from pydantic import Field
 
@@ -22,7 +23,7 @@ class DockerHost(Block):
             `docker.from_env()` or `DockerClient`.
     """
 
-    _block_type_name = "Docker Settings"
+    _block_type_name = "Docker Host"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250"  # noqa
     _description = "Store settings for interacting with a Docker host."
 
@@ -53,6 +54,7 @@ class DockerHost(Block):
         """
         Gets a Docker client to communicate with a Docker host.
         """
+        logger = get_run_logger()
         client_kwargs = {
             "version": self.version,
             "timeout": self.timeout,
@@ -63,7 +65,15 @@ class DockerHost(Block):
             key: value for key, value in client_kwargs.items() if value is not None
         }
         if self.base_url is None:
+            logger.info(
+                f"Creating a Docker client from "
+                f"environment variables, using {self.version} version."
+            )
             client = docker.from_env(**client_kwargs)
         else:
+            logger.info(
+                f"Creating a Docker client to {self.base_url} "
+                f"using {self.version} version."
+            )
             client = docker.DockerClient(base_url=self.base_url, **client_kwargs)
         return client

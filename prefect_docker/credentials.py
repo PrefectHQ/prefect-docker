@@ -1,5 +1,6 @@
 """Module containing docker credentials."""
 import docker
+from prefect import get_run_logger
 from prefect.blocks.core import Block
 from pydantic import Field, SecretStr
 
@@ -9,7 +10,7 @@ class DockerRegistryCredentials(Block):
     Block used to manage credentials for interacting with a Docker Registry.
     """
 
-    _block_type_name = "Docker Registry"
+    _block_type_name = "Docker Registry Credentials"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250"  # noqa
     _description = "Store credentials for interacting with a Docker Registry."
 
@@ -34,6 +35,8 @@ class DockerRegistryCredentials(Block):
         """
         Logs into the Docker registry.
         """
+        logger = get_run_logger()
+        logger.info(f"Logging into {self.registry_url}.")
         client.login(
             username=self.username,
             password=self.password.get_secret_value(),
