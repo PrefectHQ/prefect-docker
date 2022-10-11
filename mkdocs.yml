@@ -48,5 +48,9 @@ plugins:
 
 nav:
     - Home: index.md
+<<<<<<< HEAD
     - Settings: settings.md
     - Containers: containers.md
+=======
+    - Host: host.md
+>>>>>>> 5da131aa5d2d9dd93803ff6aeaa81410b337235d
