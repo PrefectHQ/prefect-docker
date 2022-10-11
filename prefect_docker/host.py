@@ -1,4 +1,4 @@
-"""Module containing docker settings."""
+"""Module containing Docker host settings."""
 from typing import Any, Dict, Optional
 
 import docker
@@ -6,7 +6,7 @@ from prefect.blocks.core import Block
 from pydantic import Field
 
 
-class DockerSettings(Block):
+class DockerHost(Block):
     """
     Block used to manage settings for interacting with a Docker host.
 
@@ -18,8 +18,6 @@ class DockerSettings(Block):
             automatically detect the server's version.
         timeout: Default timeout for API calls, in seconds.
         max_pool_size: The maximum number of connections to save in the pool.
-        credstore_env: Override environment variables when calling the
-            credential store process.
         client_kwargs: Additional keyword arguments to pass to
             `docker.from_env()` or `DockerClient`.
     """
@@ -42,14 +40,6 @@ class DockerSettings(Block):
         default=None,
         description="The maximum number of connections to save in the pool.",
     )
-    credstore_env: Dict[str, Any] = Field(
-        default_factory=dict,
-        title="Credential Store Environment Variables",
-        description=(
-            "Override environment variables when calling "
-            "the credential store process."
-        ),
-    )
     client_kwargs: Dict[str, Any] = Field(
         default_factory=dict,
         title="Additional Configuration",
@@ -67,8 +57,10 @@ class DockerSettings(Block):
             "version": self.version,
             "timeout": self.timeout,
             "max_pool_size": self.max_pool_size,
-            "credstore_env": self.credstore_env,
             **self.client_kwargs,
+        }
+        client_kwargs = {
+            key: value for key, value in client_kwargs.items() if value is not None
         }
         if self.base_url is None:
             client = docker.from_env(**client_kwargs)
