@@ -5,7 +5,7 @@ from typing import List, Optional, Union
 from docker.models.images import Image
 from prefect import task
 
-from prefect_docker.credentials import DockerCredentials
+from prefect_docker.credentials import DockerRegistryCredentials
 from prefect_docker.settings import DockerSettings
 
 
@@ -13,7 +13,7 @@ from prefect_docker.settings import DockerSettings
 def pull_docker_image(
     repository: str,
     docker_settings: Optional[DockerSettings] = None,
-    docker_credentials: Optional[DockerCredentials] = None,
+    docker_credentials: Optional[DockerRegistryCredentials] = None,
     tag: Optional[str] = None,
     platform: Optional[str] = None,
     all_tags: Optional[bool] = None,

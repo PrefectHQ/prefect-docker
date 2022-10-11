@@ -3,10 +3,8 @@ import docker
 from prefect.blocks.core import Block
 from pydantic import Field, SecretStr
 
-from prefect_docker.settings import DockerSettings
 
-
-class DockerCredentials(Block):
+class DockerRegistryCredentials(Block):
     """
     Block used to manage credentials for interacting with a Docker Registry.
     """
@@ -15,7 +13,6 @@ class DockerCredentials(Block):
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250"  # noqa
     _description = "Store credentials for interacting with a Docker Registry."
 
-    docker_settings: DockerSettings
     username: str = Field(
         default=..., description="The username to log into the registry with."
     )
@@ -33,11 +30,10 @@ class DockerCredentials(Block):
         description="Whether or not to reauthenticate on each interaction.",
     )
 
-    def login(self) -> docker.DockerClient:
+    def login(self, client: docker.DockerClient):
         """
         Logs into the Docker registry.
         """
-        client = self.docker_settings.get_client()
         client.login(
             username=self.username,
             password=self.password.get_secret_value(),
@@ -46,4 +42,3 @@ class DockerCredentials(Block):
             # the default value for reauth.
             reauth=self.reauth,
         )
-        return client
