@@ -3,7 +3,7 @@
 from typing import List, Optional, Union
 
 from docker.models.images import Image
-from prefect import task
+from prefect import get_run_logger, task
 
 from prefect_docker.credentials import DockerRegistryCredentials
 from prefect_docker.host import DockerHost
@@ -55,6 +55,7 @@ def pull_docker_image(
         pull_docker_image_flow()
         ```
     """
+    logger = get_run_logger()
     if tag and all_tags:
         raise ValueError("Cannot pass `tags` and `all_tags` together")
 
@@ -70,12 +71,15 @@ def pull_docker_image(
     }
 
     if docker_host is None:
+        logger.info("Creating a Docker client from the environment.")
         docker_host = DockerHost()
 
     client = docker_host.get_client()
     if docker_registry_credentials is not None:
+        logger.info("Authenticating with registry credentials.")
         docker_registry_credentials.login(client=client)
 
+    logger.info(f"Pulling the {repository} image.")
     image = client.images.pull(**pull_kwargs)
     if isinstance(image, list):
         return [img.id for img in image]
