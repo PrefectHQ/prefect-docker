@@ -4,12 +4,12 @@ from typing import Any, Dict, List, Optional, Union
 
 from prefect import task
 
-from prefect_docker.settings import DockerSettings
+from prefect_docker.host import DockerHost
 
 
 @task
 def create_docker_container(
-    docker_settings: DockerSettings,
+    docker_host: DockerHost,
     image: str,
     command: Optional[Union[str, List[str]]] = None,
     name: Optional[str] = None,
@@ -50,7 +50,7 @@ def create_docker_container(
         create_docker_container_flow()
         ```
     """
-    client = docker_settings.get_client()
+    client = docker_host.get_client()
     container = client.containers.create(
         image=image, command=command, name=name, detach=detach, **create_kwargs
     )

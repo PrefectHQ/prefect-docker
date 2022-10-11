@@ -4,8 +4,8 @@ import pytest
 
 
 @pytest.fixture
-def mock_docker_settings():
+def mock_docker_host():
     client = MagicMock()
-    docker_settings = MagicMock()
-    docker_settings.get_client.side_effect = lambda: client
-    return docker_settings
+    docker_host = MagicMock()
+    docker_host.get_client.side_effect = lambda: client
+    return docker_host
