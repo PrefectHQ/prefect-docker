@@ -22,7 +22,7 @@ class DockerHost(Block):
             `docker.from_env()` or `DockerClient`.
     """
 
-    _block_type_name = "Docker Settings"
+    _block_type_name = "Docker Host"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250"  # noqa
     _description = "Store settings for a interacting with a Docker host."
 

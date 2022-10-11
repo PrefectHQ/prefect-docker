@@ -50,14 +50,11 @@ Note, to use the `load` method on Blocks, you must already have a block document
 
 ```python
 from prefect import flow
-from prefect_docker import DockerSettings
 from prefect_docker.containers import create_docker_container
 
 @flow
 def create_docker_container_flow():
-    docker_settings = DockerSettings()
     container = create_docker_container(
-        docker_settings=docker_settings,
         image="prefecthq/prefect",
         command="echo 'hello world!'"
     )
