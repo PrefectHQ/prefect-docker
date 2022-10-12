@@ -48,12 +48,50 @@ def create_docker_container(
         ```
     """
     logger = get_run_logger()
-    if docker_host is None:
-        docker_host = DockerHost()
+    client = (docker_host or DockerHost()).get_client()
 
-    client = docker_host.get_client()
     logger.info(f"Creating container with {image!r} image.")
     container = client.containers.create(
         image=image, command=command, name=name, detach=detach, **create_kwargs
     )
     return container.id
+
+
+@task
+def get_docker_container_logs(
+    container_id: str,
+    docker_host: Optional[DockerHost] = None,
+    **logs_kwargs: Dict[str, Any],
+) -> str:
+    """
+    Get logs from this container. Similar to the docker logs command.
+
+    Args:
+        container_id: The container ID to pull logs from.
+        docker_host: Settings for interacting with a Docker host.
+        **logs_kwargs: Additional keyword arguments to pass to
+            [`client.containers.logs`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.logs).
+
+    Returns:
+        A Container's ID.
+
+    Examples:
+        Gets logs from a container with an ID that starts with "c157".
+        ```
+        from prefect import flow
+        from prefect_docker.containers import get_docker_container_logs
+
+        @flow
+        def get_docker_container_logs_flow():
+            logs = get_docker_container_logs(container_id="c157")
+            return logs
+
+        get_docker_container_logs_flow()
+        ```
+
+    """
+    logger = get_run_logger()
+    client = (docker_host or DockerHost()).get_client()
+    logger.info(f"Retrieving logs from {container_id!r} container.")
+    logs = client.containers.get(container_id).logs(**logs_kwargs)
+    return logs.decode()
