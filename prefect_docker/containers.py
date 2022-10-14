@@ -73,7 +73,7 @@ def get_docker_container_logs(
             [`client.containers.logs`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.logs).
 
     Returns:
-        A Container's ID.
+        The Container's logs.
 
     Examples:
         Gets logs from a container with an ID that starts with "c157".
