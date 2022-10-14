@@ -70,7 +70,7 @@ def get_docker_container_logs(
         container_id: The container ID to pull logs from.
         docker_host: Settings for interacting with a Docker host.
         **logs_kwargs: Additional keyword arguments to pass to
-            [`client.containers.logs`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.logs).
+            [`client.containers.get(container_id).logs`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.logs).
 
     Returns:
         The Container's logs.
