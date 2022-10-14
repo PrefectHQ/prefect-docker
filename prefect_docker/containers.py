@@ -95,3 +95,31 @@ def get_docker_container_logs(
     logger.info(f"Retrieving logs from {container_id!r} container.")
     logs = client.containers.get(container_id).logs(**logs_kwargs)
     return logs.decode()
+
+
+@task
+def start_docker_container(
+    container_id: str,
+    docker_host: Optional[DockerHost] = None,
+    **start_kwargs: Dict[str, Any],
+) -> str:
+    """
+    Get logs from this container. Similar to the docker logs command.
+
+    Args:
+        container_id: The container ID to pull logs from.
+        docker_host: Settings for interacting with a Docker host.
+        **start_kwargs: Additional keyword arguments to pass to
+            [`client.containers.get(container_id).start`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.start).
+
+    Returns:
+        The Container's ID.
+
+    Examples:
+    """
+    logger = get_run_logger()
+    client = (docker_host or DockerHost()).get_client()
+    container = client.containers.get(container_id)
+    logger.info(f"Starting {container_id!r} container.")
+    container.start(**start_kwargs)
+    return container.id

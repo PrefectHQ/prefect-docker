@@ -2,7 +2,11 @@ from unittest.mock import MagicMock
 
 from prefect.logging import disable_run_logger
 
-from prefect_docker.containers import create_docker_container, get_docker_container_logs
+from prefect_docker.containers import (
+    create_docker_container,
+    get_docker_container_logs,
+    start_docker_container,
+)
 
 
 def test_create_docker_container(mock_docker_host: MagicMock):
@@ -27,3 +31,13 @@ def test_get_docker_container_logs(mock_docker_host: MagicMock):
 
     container = client.containers.get()
     container.logs.assert_called_once()
+
+
+def test_start_docker_container(mock_docker_host: MagicMock):
+    with disable_run_logger():
+        start_docker_container.fn(container_id="m42", docker_host=mock_docker_host)
+    client = mock_docker_host.get_client()
+    client.containers.get.assert_called_once_with("m42")
+
+    container = client.containers.get()
+    container.start.assert_called_once()
