@@ -116,6 +116,18 @@ def start_docker_container(
         The Container's ID.
 
     Examples:
+        Start a container with an ID that starts wtih "c157".
+        ```
+        from prefect import flow
+        from prefect_docker.containers import start_docker_container
+
+        @flow
+        def start_docker_container_flow():
+            container_id = start_docker_container(container_id="c157")
+            return container_id
+
+        start_docker_container_flow()
+        ```
     """
     logger = get_run_logger()
     client = (docker_host or DockerHost()).get_client()
