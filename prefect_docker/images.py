@@ -4,13 +4,14 @@ from typing import List, Optional, Union
 
 from docker.models.images import Image
 from prefect import get_run_logger, task
+from prefect.utilities.asyncutils import run_sync_in_worker_thread
 
 from prefect_docker.credentials import DockerRegistryCredentials
 from prefect_docker.host import DockerHost
 
 
 @task
-def pull_docker_image(
+async def pull_docker_image(
     repository: str,
     tag: Optional[str] = None,
     platform: Optional[str] = None,
@@ -73,12 +74,13 @@ def pull_docker_image(
     if docker_host is None:
         docker_host = DockerHost()
 
-    client = docker_host.get_client()
-    if docker_registry_credentials is not None:
-        docker_registry_credentials.login(client=client)
+    with docker_host.get_client() as client:
+        if docker_registry_credentials is not None:
+            await docker_registry_credentials.login(client=client)
 
-    logger.info(f"Pulling the {repository} image.")
-    image = client.images.pull(**pull_kwargs)
+        logger.info(f"Pulling the {repository} image.")
+        image = await run_sync_in_worker_thread(client.images.pull, **pull_kwargs)
+
     if isinstance(image, list):
         return [img.id for img in image]
     else:

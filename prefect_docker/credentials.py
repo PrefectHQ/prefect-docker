@@ -2,6 +2,7 @@
 import docker
 from prefect import get_run_logger
 from prefect.blocks.core import Block
+from prefect.utilities.asyncutils import run_sync_in_worker_thread
 from pydantic import Field, SecretStr
 
 
@@ -31,13 +32,14 @@ class DockerRegistryCredentials(Block):
         description="Whether or not to reauthenticate on each interaction.",
     )
 
-    def login(self, client: docker.DockerClient):
+    async def login(self, client: docker.DockerClient):
         """
         Logs into the Docker registry.
         """
         logger = get_run_logger()
         logger.info(f"Logging into {self.registry_url}.")
-        client.login(
+        await run_sync_in_worker_thread(
+            client.login,
             username=self.username,
             password=self.password.get_secret_value(),
             registry=self.registry_url,
