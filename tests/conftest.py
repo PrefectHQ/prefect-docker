@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import docker
 import pytest
@@ -42,10 +42,12 @@ def mock_docker_host(mock_docker_client):
     return docker_host
 
 
+async def mock_login(client):
+    client._authenticated = True
+
+
 @pytest.fixture
 def mock_docker_registry_credentials():
-    docker_registry_credentials = AsyncMock()
-    docker_registry_credentials.login.side_effect = lambda client: setattr(
-        client, "_authenticated", True
-    )
+    docker_registry_credentials = MagicMock()
+    docker_registry_credentials.login.side_effect = mock_login
     return docker_registry_credentials
