@@ -7,6 +7,24 @@ from prefect.blocks.core import Block
 from pydantic import Field
 
 
+class _ContextManageableDockerClient(docker.DockerClient):
+    """
+    Allow context managing Docker Client, but also allow it to be instantiated without.
+    """
+
+    def __enter__(self):
+        """
+        Enters the context manager.
+        """
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Exits the context manager and closes the DockerClient.
+        """
+        self.close()
+
+
 class DockerHost(Block):
     """
     Block used to manage settings for interacting with a Docker host.
@@ -69,11 +87,13 @@ class DockerHost(Block):
                 f"Creating a Docker client from "
                 f"environment variables, using {self.version} version."
             )
-            client = docker.from_env(**client_kwargs)
+            client = _ContextManageableDockerClient.from_env(**client_kwargs)
         else:
             logger.info(
                 f"Creating a Docker client to {self.base_url} "
                 f"using {self.version} version."
             )
-            client = docker.DockerClient(base_url=self.base_url, **client_kwargs)
+            client = _ContextManageableDockerClient(
+                base_url=self.base_url, **client_kwargs
+            )
         return client
