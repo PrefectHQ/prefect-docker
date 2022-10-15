@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import MagicMock
 
 import pytest
 from prefect.logging import disable_run_logger
@@ -36,7 +36,7 @@ class TestPullDockerImage:
     async def test_login(
         self,
         mock_docker_host: MagicMock,
-        mock_docker_registry_credentials: AsyncMock,
+        mock_docker_registry_credentials: MagicMock,
     ):
         pull_kwargs = dict(
             repository="prefecthq/prefect",
