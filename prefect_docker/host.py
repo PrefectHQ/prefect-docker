@@ -83,13 +83,13 @@ class DockerHost(Block):
             key: value for key, value in client_kwargs.items() if value is not None
         }
         if self.base_url is None:
-            logger.info(
+            logger.debug(
                 f"Creating a Docker client from "
                 f"environment variables, using {self.version} version."
             )
             client = _ContextManageableDockerClient.from_env(**client_kwargs)
         else:
-            logger.info(
+            logger.debug(
                 f"Creating a Docker client to {self.base_url} "
                 f"using {self.version} version."
             )
