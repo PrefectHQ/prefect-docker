@@ -1,21 +1,22 @@
 """Integrations with Docker Containers."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Container, Dict, List, Optional, Union
 
 from prefect import get_run_logger, task
+from prefect.utilities.asyncutils import run_sync_in_worker_thread
 
 from prefect_docker.host import DockerHost
 
 
 @task
-def create_docker_container(
+async def create_docker_container(
     image: str,
     command: Optional[Union[str, List[str]]] = None,
     name: Optional[str] = None,
     detach: Optional[bool] = None,
     docker_host: Optional[DockerHost] = None,
     **create_kwargs: Dict[str, Any],
-) -> int:
+) -> str:
     """
     Create a container without starting it. Similar to docker create.
 
@@ -48,17 +49,22 @@ def create_docker_container(
         ```
     """
     logger = get_run_logger()
-    client = (docker_host or DockerHost()).get_client()
 
-    logger.info(f"Creating container with {image!r} image.")
-    container = client.containers.create(
-        image=image, command=command, name=name, detach=detach, **create_kwargs
-    )
+    with (docker_host or DockerHost()).get_client() as client:
+        logger.info(f"Creating container with {image!r} image.")
+        container = await run_sync_in_worker_thread(
+            client.containers.create,
+            image=image,
+            command=command,
+            name=name,
+            detach=detach,
+            **create_kwargs,
+        )
     return container.id
 
 
 @task
-def get_docker_container_logs(
+async def get_docker_container_logs(
     container_id: str,
     docker_host: Optional[DockerHost] = None,
     **logs_kwargs: Dict[str, Any],
@@ -70,7 +76,7 @@ def get_docker_container_logs(
         container_id: The container ID to pull logs from.
         docker_host: Settings for interacting with a Docker host.
         **logs_kwargs: Additional keyword arguments to pass to
-            [`client.containers.logs`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.logs).
+            [`client.containers.get(container_id).logs`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.logs).
 
     Returns:
         The Container's logs.
@@ -91,18 +97,21 @@ def get_docker_container_logs(
 
     """
     logger = get_run_logger()
-    client = (docker_host or DockerHost()).get_client()
-    logger.info(f"Retrieving logs from {container_id!r} container.")
-    logs = client.containers.get(container_id).logs(**logs_kwargs)
+
+    with (docker_host or DockerHost()).get_client() as client:
+        logger.info(f"Retrieving logs from {container_id!r} container.")
+        container = await run_sync_in_worker_thread(client.containers.get, container_id)
+        logs = await run_sync_in_worker_thread(container.logs, **logs_kwargs)
+
     return logs.decode()
 
 
 @task
-def start_docker_container(
+async def start_docker_container(
     container_id: str,
     docker_host: Optional[DockerHost] = None,
     **start_kwargs: Dict[str, Any],
-) -> str:
+) -> Container:
     """
     Get logs from this container. Similar to the docker logs command.
 
@@ -130,8 +139,10 @@ def start_docker_container(
         ```
     """
     logger = get_run_logger()
-    client = (docker_host or DockerHost()).get_client()
-    container = client.containers.get(container_id)
-    logger.info(f"Starting {container_id!r} container.")
-    container.start(**start_kwargs)
-    return container.id
+
+    with (docker_host or DockerHost()).get_client() as client:
+        logger.info(f"Starting {container_id!r} container.")
+        container = await run_sync_in_worker_thread(client.containers.get, container_id)
+        await run_sync_in_worker_thread(container.start, **start_kwargs)
+
+    return container
