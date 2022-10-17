@@ -17,21 +17,23 @@ class TestPullDockerImage:
 
     async def test_defaults(self, mock_docker_client_from_env: MagicMock):
         with disable_run_logger():
-            image_id = await pull_docker_image.fn(repository="prefecthq/prefect")
-        assert image_id == "id_1"
+            image = await pull_docker_image.fn(repository="prefecthq/prefect")
+        assert image.id == "id_1"
 
     async def test_host(self, mock_docker_host: MagicMock):
         pull_kwargs = dict(
             repository="prefecthq/prefect",
         )
         with disable_run_logger():
-            image_id = await pull_docker_image.fn(
+            image = await pull_docker_image.fn(
                 docker_host=mock_docker_host, **pull_kwargs
             )
-        assert image_id == "id_1"
+        assert image.id == "id_1"
 
         client = mock_docker_host.get_client()
-        client.__enter__.return_value.images.pull.assert_called_once_with(**pull_kwargs)
+        client.__enter__.return_value.images.pull.assert_called_once_with(
+            all_tags=False, **pull_kwargs
+        )
 
     async def test_login(
         self,
@@ -43,23 +45,26 @@ class TestPullDockerImage:
             tag="latest",
         )
         with disable_run_logger():
-            image_id = await pull_docker_image.fn(
+            image = await pull_docker_image.fn(
                 docker_host=mock_docker_host,
                 docker_registry_credentials=mock_docker_registry_credentials,
                 **pull_kwargs
             )
-        assert image_id == "id_1"
+        assert image.id == "id_1"
 
         client = mock_docker_host.get_client()
-        client.__enter__.return_value.images.pull.assert_called_once_with(**pull_kwargs)
+        client.__enter__.return_value.images.pull.assert_called_once_with(
+            all_tags=False, **pull_kwargs
+        )
 
     async def test_all_tags(self, mock_docker_host: MagicMock):
         pull_kwargs = dict(repository="prefecthq/prefect", all_tags=True)
         with disable_run_logger():
-            image_ids = await pull_docker_image.fn(
+            images = await pull_docker_image.fn(
                 docker_host=mock_docker_host, **pull_kwargs
             )
-        assert image_ids == ["id_1", "id_2"]
+            images = [image.id for image in images]
+        assert images == ["id_1", "id_2"]
 
         client = mock_docker_host.get_client()
         client.__enter__.return_value.images.pull.assert_called_once_with(**pull_kwargs)
