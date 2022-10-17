@@ -26,9 +26,11 @@ Released on ????? ?th, 20??.
 ### Added
 
 - `DockerSettings` block - [#3](https://github.com/PrefectHQ/prefect-docker/pull/3)
+- `pull_docker_image` task - [#9](https://github.com/PrefectHQ/prefect-docker/pull/9)
 - `create_docker_container` task - [#12](https://github.com/PrefectHQ/prefect-docker/pull/12)
 - `get_docker_container_logs` task - [#14](https://github.com/PrefectHQ/prefect-docker/pull/14)
 - `start_docker_container` task - [#18](https://github.com/PrefectHQ/prefect-docker/pull/18)
+- `stop_docker_container` task - [#21](https://github.com/PrefectHQ/prefect-docker/pull/21)
 
 ### Changed
 
