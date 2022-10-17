@@ -2,8 +2,27 @@
 from typing import Any, Dict, Optional
 
 import docker
+from prefect import get_run_logger
 from prefect.blocks.core import Block
 from pydantic import Field
+
+
+class _ContextManageableDockerClient(docker.DockerClient):
+    """
+    Allow context managing Docker Client, but also allow it to be instantiated without.
+    """
+
+    def __enter__(self):
+        """
+        Enters the context manager.
+        """
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Exits the context manager and closes the DockerClient.
+        """
+        self.close()
 
 
 class DockerHost(Block):
@@ -24,11 +43,11 @@ class DockerHost(Block):
 
     _block_type_name = "Docker Host"
     _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250"  # noqa
-    _description = "Store settings for a interacting with a Docker host."
+    _description = "Store settings for interacting with a Docker host."
 
     base_url: Optional[str] = Field(
         default=None,
-        description="URL to the Docker server.",
+        description="URL to the Docker host.",
         title="Base URL",
         example="unix:///var/run/docker.sock",
     )
@@ -51,8 +70,9 @@ class DockerHost(Block):
 
     def get_client(self) -> docker.DockerClient:
         """
-        Gets a Docker client to communicate with a Docker server.
+        Gets a Docker client to communicate with a Docker host.
         """
+        logger = get_run_logger()
         client_kwargs = {
             "version": self.version,
             "timeout": self.timeout,
@@ -63,7 +83,17 @@ class DockerHost(Block):
             key: value for key, value in client_kwargs.items() if value is not None
         }
         if self.base_url is None:
-            client = docker.from_env(**client_kwargs)
+            logger.info(
+                f"Creating a Docker client from "
+                f"environment variables, using {self.version} version."
+            )
+            client = _ContextManageableDockerClient.from_env(**client_kwargs)
         else:
-            client = docker.DockerClient(base_url=self.base_url, **client_kwargs)
+            logger.info(
+                f"Creating a Docker client to {self.base_url} "
+                f"using {self.version} version."
+            )
+            client = _ContextManageableDockerClient(
+                base_url=self.base_url, **client_kwargs
+            )
         return client
