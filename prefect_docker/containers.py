@@ -110,7 +110,7 @@ async def get_docker_container_logs(
 async def start_docker_container(
     container_id: str,
     docker_host: Optional[DockerHost] = None,
-    **stop_kwargs: Dict[str, Any],
+    **start_kwargs: Dict[str, Any],
 ) -> Container:
     """
     Get logs from this container. Similar to the docker logs command.
@@ -118,7 +118,7 @@ async def start_docker_container(
     Args:
         container_id: The container ID to pull logs from.
         docker_host: Settings for interacting with a Docker host.
-        **stop_kwargs: Additional keyword arguments to pass to
+        **start_kwargs: Additional keyword arguments to pass to
             [`client.containers.get(container_id).start`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.start).
 
     Returns:
