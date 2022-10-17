@@ -1,6 +1,5 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-import docker
 import pytest
 from prefect.logging import disable_run_logger
 
@@ -8,16 +7,6 @@ from prefect_docker.host import DockerHost, _ContextManageableDockerClient
 
 
 class TestDockerHost:
-    @pytest.fixture
-    def mock_docker_client_new(self) -> MagicMock:
-        with patch.object(docker.DockerClient, "__new__") as docker_client:
-            yield docker_client
-
-    @pytest.fixture
-    def mock_docker_client_from_env(self) -> MagicMock:
-        with patch.object(docker.DockerClient, "from_env") as docker_client:
-            yield docker_client
-
     @pytest.fixture
     def host_kwargs(self):
         _host_kwargs = dict(

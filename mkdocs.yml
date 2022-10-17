@@ -48,3 +48,4 @@ watch:
 nav:
     - Home: index.md
     - Host: host.md
+    - Images: images.md

@@ -18,7 +18,11 @@
 
 ## Welcome!
 
-Prefect integrations for working with Docker
+Prefect integrations for working with Docker.
+
+Note! The `DockerRegistryCredentials` in `prefect-docker` is a unique block, separate from the `DockerRegistry` in `prefect` core. While `DockerRegistry` implements a few functionality from both `DockerHost` and `DockerRegistryCredentials` for convenience, it does not allow much configuration to interact with a Docker host.
+
+Do not use `DockerRegistry` with this collection. Instead, use `DockerHost` and `DockerRegistryCredentials`.
 
 ## Getting Started
 
