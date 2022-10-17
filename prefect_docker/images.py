@@ -15,7 +15,7 @@ async def pull_docker_image(
     repository: str,
     tag: Optional[str] = None,
     platform: Optional[str] = None,
-    all_tags: Optional[bool] = None,
+    all_tags: bool = False,
     docker_host: Optional[DockerHost] = None,
     docker_registry_credentials: Optional[DockerRegistryCredentials] = None,
     **pull_kwargs,
@@ -37,7 +37,7 @@ async def pull_docker_image(
         **pull_kwargs: Additional keyword arguments to pass to `client.images.pull`.
 
     Returns:
-        The image ID that has been pulled, or image IDs if `all_tags` is `True`.
+        The image that has been pulled, or a list of images if `all_tags` is `True`.
 
     Examples:
         Pull prefecthq/prefect image with the tag latest-python3.10.
@@ -71,17 +71,15 @@ async def pull_docker_image(
         key: value for key, value in pull_kwargs.items() if value is not None
     }
 
-    if docker_host is None:
-        docker_host = DockerHost()
-
-    with docker_host.get_client() as client:
+    with (docker_host or DockerHost()).get_client() as client:
         if docker_registry_credentials is not None:
             await docker_registry_credentials.login(client=client)
 
-        logger.info(f"Pulling the {repository} image.")
+        if tag:
+            logger.info(f"Pulling image: {repository}:{tag}.")
+        elif all_tags:
+            logger.info(f"Pulling all images from: {repository}")
+
         image = await run_sync_in_worker_thread(client.images.pull, **pull_kwargs)
 
-    if isinstance(image, list):
-        return [img.id for img in image]
-    else:
-        return image.id
+    return image

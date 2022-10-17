@@ -26,6 +26,7 @@ class DockerRegistryCredentials(Block):
         description=(
             'The URL to the registry. Generally, "http" or "https" can be omitted.'
         ),
+        example="registry.hub.docker.com",
     )
     reauth: bool = Field(
         default=True,
@@ -34,10 +35,10 @@ class DockerRegistryCredentials(Block):
 
     async def login(self, client: docker.DockerClient):
         """
-        Logs into the Docker registry.
+        Authenticates a given Docker client with the configured Docker registry.
         """
         logger = get_run_logger()
-        logger.info(f"Logging into {self.registry_url}.")
+        logger.debug(f"Logging into {self.registry_url}.")
         await run_sync_in_worker_thread(
             client.login,
             username=self.username,
