@@ -143,7 +143,7 @@ async def start_docker_container(
     with (docker_host or DockerHost()).get_client() as client:
         logger.info(f"Starting {container_id!r} container.")
         container = await run_sync_in_worker_thread(client.containers.get, container_id)
-        await run_sync_in_worker_thread(container.start, **stop_kwargs)
+        await run_sync_in_worker_thread(container.start, **start_kwargs)
 
     return container
 
