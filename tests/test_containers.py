@@ -32,7 +32,7 @@ class TestCreateDockerContainer:
 
 class TestGetDockerContainerLogs:
     async def test_logs_kwargs(self, mock_docker_host: MagicMock):
-        logs_kwargs = dict(container_id=42)
+        logs_kwargs = dict(container_id="42")
         with disable_run_logger():
             logs = await get_docker_container_logs.fn(
                 docker_host=mock_docker_host, **logs_kwargs
@@ -42,9 +42,9 @@ class TestGetDockerContainerLogs:
 
 class TestStartDockerContainer:
     async def test_start_kwargs(self, mock_docker_host: MagicMock):
-        start_kwargs = dict(container_id=42)
+        start_kwargs = dict(container_id="42")
         with disable_run_logger():
-            logs = await start_docker_container.fn(
+            container = await start_docker_container.fn(
                 docker_host=mock_docker_host, **start_kwargs
             )
-        assert logs == "here are logs"
+        assert container.id == "42"

@@ -122,7 +122,7 @@ async def start_docker_container(
             [`client.containers.get(container_id).start`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.start).
 
     Returns:
-        The Container's ID.
+        The Docker Container object.
 
     Examples:
         Start a container with an ID that starts wtih "c157".
