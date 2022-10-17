@@ -71,10 +71,7 @@ async def pull_docker_image(
         key: value for key, value in pull_kwargs.items() if value is not None
     }
 
-    if docker_host is None:
-        docker_host = DockerHost()
-
-    with docker_host.get_client() as client:
+    with (docker_host or DockerHost()).get_client() as client:
         if docker_registry_credentials is not None:
             await docker_registry_credentials.login(client=client)
 
