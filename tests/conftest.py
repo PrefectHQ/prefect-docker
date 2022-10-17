@@ -16,6 +16,7 @@ def mock_docker_client():
         mock_images_pull
     )
     client.__enter__.return_value.images.pull.side_effect = mock_images_pull
+    client.__enter__.return_value.images.return_value = ["id_1"]
     return client
 
 
