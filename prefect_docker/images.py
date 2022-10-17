@@ -37,7 +37,7 @@ async def pull_docker_image(
         **pull_kwargs: Additional keyword arguments to pass to `client.images.pull`.
 
     Returns:
-        The image ID that has been pulled, or image IDs if `all_tags` is `True`.
+        The image that has been pulled, or a list of images if `all_tags` is `True`.
 
     Examples:
         Pull prefecthq/prefect image with the tag latest-python3.10.

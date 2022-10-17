@@ -1,6 +1,6 @@
 """Integrations with Docker Containers."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Container, Dict, List, Optional, Union
 
 from prefect import get_run_logger, task
 from prefect.utilities.asyncutils import run_sync_in_worker_thread
@@ -16,7 +16,7 @@ async def create_docker_container(
     detach: Optional[bool] = None,
     docker_host: Optional[DockerHost] = None,
     **create_kwargs: Dict[str, Any],
-) -> int:
+) -> Container:
     """
     Create a container without starting it. Similar to docker create.
 
@@ -30,7 +30,7 @@ async def create_docker_container(
             [`client.containers.create`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.create).
 
     Returns:
-        A Container's ID.
+        A Docker Container object.
 
     Examples:
         Create a container with the Prefect image.
@@ -60,4 +60,4 @@ async def create_docker_container(
             detach=detach,
             **create_kwargs,
         )
-    return container.id
+    return container
