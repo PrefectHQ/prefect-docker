@@ -64,7 +64,7 @@ async def create_docker_container(
 
 
 @task
-def get_docker_container_logs(
+async def get_docker_container_logs(
     container_id: str,
     docker_host: Optional[DockerHost] = None,
     **logs_kwargs: Dict[str, Any],
@@ -97,8 +97,10 @@ def get_docker_container_logs(
 
     """
     logger = get_run_logger()
-    client = (docker_host or DockerHost()).get_client()
 
-    logger.info(f"Retrieving logs from {container_id!r} container.")
-    logs = client.containers.get(container_id).logs(**logs_kwargs)
+    with (docker_host or DockerHost()).get_client() as client:
+        logger.info(f"Retrieving logs from {container_id!r} container.")
+        container = await run_sync_in_worker_thread(client.containers.get, container_id)
+        logs = await run_sync_in_worker_thread(container.logs, **logs_kwargs)
+
     return logs.decode()

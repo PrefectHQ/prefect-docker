@@ -10,13 +10,21 @@ def mock_images_pull(all_tags=False, **kwargs):
 
 
 @pytest.fixture
-def mock_docker_client():
+def mock_docker_container():
+    container = MagicMock()
+    container.logs.side_effect = lambda **logs_kwargs: b"here are logs"
+    return container
+
+
+@pytest.fixture
+def mock_docker_client(mock_docker_container):
     client = MagicMock(_authenticated=False)
     client.return_value.__enter__.return_value.images.pull.side_effect = (
         mock_images_pull
     )
     client.__enter__.return_value.images.pull.side_effect = mock_images_pull
     client.__enter__.return_value.containers.create.return_value = MagicMock(id="id_1")
+    client.__enter__.return_value.containers.get.return_value = mock_docker_container
     return client
 
 
