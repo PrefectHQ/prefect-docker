@@ -113,10 +113,10 @@ async def start_docker_container(
     **start_kwargs: Dict[str, Any],
 ) -> Container:
     """
-    Get logs from this container. Similar to the docker logs command.
+    Start this container. Similar to the docker start command.
 
     Args:
-        container_id: The container ID to pull logs from.
+        container_id: The container ID to start.
         docker_host: Settings for interacting with a Docker host.
         **start_kwargs: Additional keyword arguments to pass to
             [`client.containers.get(container_id).start`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.start).
