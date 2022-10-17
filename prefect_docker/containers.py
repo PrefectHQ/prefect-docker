@@ -50,7 +50,7 @@ async def create_docker_container(
     """
     logger = get_run_logger()
 
-    with docker_host.get_client() as client:
+    with (docker_host or DockerHost()).get_client() as client:
         logger.info(f"Creating container with {image!r} image.")
         container = await run_sync_in_worker_thread(
             client.containers.create,
