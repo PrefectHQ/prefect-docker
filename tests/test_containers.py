@@ -15,10 +15,10 @@ class TestCreateDockerContainer:
             ports={"2222/tcp": 3333},
         )
         with disable_run_logger():
-            container_id = await create_docker_container.fn(
+            container = await create_docker_container.fn(
                 docker_host=mock_docker_host, **create_kwargs
             )
-        assert container_id == "id_1"
+        assert container.id == "id_1"
 
         client = mock_docker_host.get_client()
         client.__enter__.return_value.containers.create.assert_called_once_with(
