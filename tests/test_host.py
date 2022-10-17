@@ -1,55 +1,91 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
+import docker
 import pytest
+from prefect.logging import disable_run_logger
 
-from prefect_docker.host import DockerHost
-
-
-@pytest.fixture
-def mock_docker(monkeypatch) -> MagicMock:
-    docker = MagicMock(DockerClient=MagicMock())
-    docker.from_env.side_effect = lambda **kwargs: kwargs
-    monkeypatch.setattr("prefect_docker.host.docker", docker)
-    return docker
+from prefect_docker.host import DockerHost, _ContextManageableDockerClient
 
 
-def test_docker_host_get_client(mock_docker: MagicMock):
-    settings_kwargs = dict(
-        base_url="unix:///var/run/docker.sock",
-        version="1.35",
-        max_pool_size=8,
-        client_kwargs={"tls": True},
-        timeout=None,
-        credstore_env=None,
-    )
-    settings = DockerHost(**settings_kwargs)
-    for key, val in settings_kwargs.items():
-        assert getattr(settings, key) == val
+class TestDockerHost:
+    @pytest.fixture
+    def mock_docker_client_new(self) -> MagicMock:
+        with patch.object(docker.DockerClient, "__new__") as docker_client:
+            yield docker_client
 
-    settings.get_client()
-    mock_docker.DockerClient.assert_called_once_with(
-        base_url="unix:///var/run/docker.sock",
-        version="1.35",
-        max_pool_size=8,
-        tls=True,
-    )
+    @pytest.fixture
+    def mock_docker_client_from_env(self) -> MagicMock:
+        with patch.object(docker.DockerClient, "from_env") as docker_client:
+            yield docker_client
 
+    @pytest.fixture
+    def host_kwargs(self):
+        _host_kwargs = dict(
+            base_url="unix:///var/run/docker.sock",
+            version="1.35",
+            max_pool_size=8,
+            credstore_env=None,
+            client_kwargs={"tls": True},
+        )
+        return _host_kwargs
 
-def test_docker_host_get_client_from_env(mock_docker: MagicMock):
-    settings_kwargs = dict(
-        version="1.35",
-        max_pool_size=8,
-        client_kwargs={"assert_hostname": True},
-        timeout=None,
-        credstore_env=None,
-    )
-    settings = DockerHost(**settings_kwargs)
-    for key, val in settings_kwargs.items():
-        assert getattr(settings, key) == val
+    @pytest.fixture
+    def docker_host(self, host_kwargs):
+        _docker_host = DockerHost(**host_kwargs)
+        for key, val in host_kwargs.items():
+            assert getattr(_docker_host, key) == val
+        return _docker_host
 
-    settings.get_client()
-    mock_docker.from_env.assert_called_once_with(
-        version="1.35",
-        max_pool_size=8,
-        assert_hostname=True,
-    )
+    @pytest.fixture
+    def docker_host_from_env(self, host_kwargs):
+        host_kwargs.pop("base_url")
+        _docker_host = DockerHost(**host_kwargs)
+        for key, val in host_kwargs.items():
+            assert getattr(_docker_host, key) == val
+        return _docker_host
+
+    def test_get_client(self, docker_host, mock_docker_client_new: MagicMock):
+        with disable_run_logger():
+            docker_host.get_client()
+            mock_docker_client_new.assert_called_once_with(
+                _ContextManageableDockerClient,
+                base_url="unix:///var/run/docker.sock",
+                version="1.35",
+                max_pool_size=8,
+                tls=True,
+            )
+
+    def test_context_managed_get_client(
+        self, docker_host, mock_docker_client_new: MagicMock
+    ):
+        with disable_run_logger():
+            with docker_host.get_client() as _:
+                mock_docker_client_new.assert_called_once_with(
+                    _ContextManageableDockerClient,
+                    base_url="unix:///var/run/docker.sock",
+                    version="1.35",
+                    max_pool_size=8,
+                    tls=True,
+                )
+
+    def test_get_client_from_env(
+        self, docker_host_from_env, mock_docker_client_from_env: MagicMock
+    ):
+        with disable_run_logger():
+            docker_host_from_env.get_client()
+            mock_docker_client_from_env.assert_called_once_with(
+                version="1.35",
+                max_pool_size=8,
+                tls=True,
+            )
+
+    def test_context_managed_get_client_from_env(
+        self, docker_host_from_env, mock_docker_client_from_env: MagicMock
+    ):
+        with disable_run_logger():
+            with docker_host_from_env.get_client() as _:
+                mock_docker_client_from_env.assert_called_once_with(
+                    version="1.35",
+                    max_pool_size=8,
+                    tls=True,
+                )
