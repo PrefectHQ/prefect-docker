@@ -21,6 +21,6 @@ class TestCreateDockerContainer:
         assert container_id == "id_1"
 
         client = mock_docker_host.get_client()
-        client.__enter__.return_value.images.pull.assert_called_once_with(
+        client.__enter__.return_value.containers.create.assert_called_once_with(
             **create_kwargs
         )
