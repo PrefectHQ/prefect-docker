@@ -49,3 +49,4 @@ nav:
     - Home: index.md
     - Host: host.md
     - Containers: containers.md
+    - Images: images.md

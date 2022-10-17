@@ -3,12 +3,13 @@
 from typing import Any, Dict, List, Optional, Union
 
 from prefect import get_run_logger, task
+from prefect.utilities.asyncutils import run_sync_in_worker_thread
 
 from prefect_docker.host import DockerHost
 
 
 @task
-def create_docker_container(
+async def create_docker_container(
     image: str,
     command: Optional[Union[str, List[str]]] = None,
     name: Optional[str] = None,
@@ -51,9 +52,14 @@ def create_docker_container(
     if docker_host is None:
         docker_host = DockerHost()
 
-    client = docker_host.get_client()
-    logger.info(f"Creating container with {image!r} image.")
-    container = client.containers.create(
-        image=image, command=command, name=name, detach=detach, **create_kwargs
-    )
+    with docker_host.get_client() as client:
+        logger.info(f"Creating container with {image!r} image.")
+        container = await run_sync_in_worker_thread(
+            client.containers.create,
+            image=image,
+            command=command,
+            name=name,
+            detach=detach,
+            **create_kwargs,
+        )
     return container.id
