@@ -110,7 +110,7 @@ async def get_docker_container_logs(
 async def start_docker_container(
     container_id: str,
     docker_host: Optional[DockerHost] = None,
-    **start_kwargs: Dict[str, Any],
+    **stop_kwargs: Dict[str, Any],
 ) -> Container:
     """
     Get logs from this container. Similar to the docker logs command.
@@ -118,7 +118,7 @@ async def start_docker_container(
     Args:
         container_id: The container ID to pull logs from.
         docker_host: Settings for interacting with a Docker host.
-        **start_kwargs: Additional keyword arguments to pass to
+        **stop_kwargs: Additional keyword arguments to pass to
             [`client.containers.get(container_id).start`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.start).
 
     Returns:
@@ -143,6 +143,48 @@ async def start_docker_container(
     with (docker_host or DockerHost()).get_client() as client:
         logger.info(f"Starting {container_id!r} container.")
         container = await run_sync_in_worker_thread(client.containers.get, container_id)
-        await run_sync_in_worker_thread(container.start, **start_kwargs)
+        await run_sync_in_worker_thread(container.start, **stop_kwargs)
+
+    return container
+
+
+@task
+async def stop_docker_container(
+    container_id: str,
+    docker_host: Optional[DockerHost] = None,
+    **stop_kwargs: Dict[str, Any],
+) -> Container:
+    """
+    Stops a container. Similar to the docker stop command.
+
+    Args:
+        container_id: The container ID to stop.
+        docker_host: Settings for interacting with a Docker host.
+        **stop_kwargs: Additional keyword arguments to pass to
+            [`client.containers.get(container_id).stop`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.stop).
+
+    Returns:
+        The Docker Container object.
+
+    Examples:
+        Stop a container with an ID that starts wtih "c157".
+        ```
+        from prefect import flow
+        from prefect_docker.containers import stop_docker_container
+
+        @flow
+        def stop_docker_container_flow():
+            container = stop_docker_container(container_id="c157")
+            return container
+
+        stop_docker_container_flow()
+        ```
+    """
+    logger = get_run_logger()
+
+    with (docker_host or DockerHost()).get_client() as client:
+        logger.info(f"Stopping {container_id!r} container.")
+        container = await run_sync_in_worker_thread(client.containers.get, container_id)
+        await run_sync_in_worker_thread(container.stop, **stop_kwargs)
 
     return container
