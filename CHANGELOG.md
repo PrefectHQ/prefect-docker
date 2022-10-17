@@ -30,7 +30,7 @@ Released on ????? ?th, 20??.
 - `create_docker_container` task - [#12](https://github.com/PrefectHQ/prefect-docker/pull/12)
 - `get_docker_container_logs` task - [#14](https://github.com/PrefectHQ/prefect-docker/pull/14)
 - `start_docker_container` task - [#18](https://github.com/PrefectHQ/prefect-docker/pull/18)
-- `stop_docker_container` task - [#21](https://github.com/PrefectHQ/prefect-docker/pull/21)
+- `stop_docker_container` task - [#24](https://github.com/PrefectHQ/prefect-docker/pull/24)
 
 ### Changed
 
