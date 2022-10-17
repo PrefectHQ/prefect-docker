@@ -16,7 +16,7 @@ async def create_docker_container(
     detach: Optional[bool] = None,
     docker_host: Optional[DockerHost] = None,
     **create_kwargs: Dict[str, Any],
-) -> int:
+) -> str:
     """
     Create a container without starting it. Similar to docker create.
 
