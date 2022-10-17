@@ -5,6 +5,7 @@ from prefect.logging import disable_run_logger
 from prefect_docker.containers import (
     create_docker_container,
     get_docker_container_logs,
+    remove_docker_container,
     start_docker_container,
     stop_docker_container,
 )
@@ -63,6 +64,19 @@ class TestStopDockerContainer:
         with disable_run_logger():
             container = await stop_docker_container.fn(
                 docker_host=mock_docker_host, **stop_kwargs
+            )
+        assert container.id == "42"
+
+        client = mock_docker_host.get_client()
+        client.__enter__.return_value.containers.get.assert_called_once_with("42")
+
+
+class TestRemoveDockerContainer:
+    async def test_remove_kwargs(self, mock_docker_host: MagicMock):
+        remove_kwargs = dict(container_id="42")
+        with disable_run_logger():
+            container = await remove_docker_container.fn(
+                docker_host=mock_docker_host, **remove_kwargs
             )
         assert container.id == "42"
 
