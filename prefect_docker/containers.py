@@ -184,7 +184,7 @@ async def stop_docker_container(
 
     with (docker_host or DockerHost()).get_client() as client:
         container = await run_sync_in_worker_thread(client.containers.get, container_id)
-        logger.info(f"Stopping {container.id!r} container.")
+        logger.info(f"Stopping container {container.id!r}.")
         await run_sync_in_worker_thread(container.stop, **stop_kwargs)
 
     return container
