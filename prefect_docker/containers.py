@@ -99,8 +99,8 @@ async def get_docker_container_logs(
     logger = get_run_logger()
 
     with (docker_host or DockerHost()).get_client() as client:
-        logger.info(f"Retrieving logs from {container_id!r} container.")
         container = await run_sync_in_worker_thread(client.containers.get, container_id)
+        logger.info(f"Retrieving logs from {container.id!r} container.")
         logs = await run_sync_in_worker_thread(container.logs, **logs_kwargs)
 
     return logs.decode()
