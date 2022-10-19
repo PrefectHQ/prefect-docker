@@ -225,8 +225,8 @@ async def remove_docker_container(
     logger = get_run_logger()
 
     with (docker_host or DockerHost()).get_client() as client:
-        logger.info(f"Removing {container_id!r} container.")
         container = await run_sync_in_worker_thread(client.containers.get, container_id)
+        logger.info(f"Removing container {container.id!r}.")
         await run_sync_in_worker_thread(container.remove, **remove_kwargs)
 
     return container
