@@ -39,6 +39,19 @@ class DockerHost(Block):
         max_pool_size: The maximum number of connections to save in the pool.
         client_kwargs: Additional keyword arguments to pass to
             `docker.from_env()` or `DockerClient`.
+
+    Examples:
+        Get a Docker Host client.
+        ```python
+        from prefect_docker import DockerHost
+
+        docker_host = DockerHost(
+        base_url="tcp://127.0.0.1:1234",
+            max_pool_size=4
+        )
+        with docker_host.get_client() as client:
+            ... # Use the client for Docker operations
+        ```
     """
 
     _block_type_name = "Docker Host"
@@ -70,7 +83,10 @@ class DockerHost(Block):
 
     def get_client(self) -> docker.DockerClient:
         """
-        Gets a Docker client to communicate with a Docker host.
+        Gets a Docker Client to communicate with a Docker host.
+
+        Returns:
+            A Docker Client.
         """
         logger = get_run_logger()
         client_kwargs = {
