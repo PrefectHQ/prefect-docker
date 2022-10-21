@@ -106,8 +106,8 @@ async def get_docker_container_logs(
     logger = get_run_logger()
 
     with (docker_host or DockerHost()).get_client() as client:
-        logger.info(f"Retrieving logs from {container_id!r} container.")
         container = await run_sync_in_worker_thread(client.containers.get, container_id)
+        logger.info(f"Retrieving logs from {container.id!r} container.")
         logs = await run_sync_in_worker_thread(container.logs, **logs_kwargs)
 
     return logs.decode()
@@ -193,5 +193,47 @@ async def stop_docker_container(
         container = await run_sync_in_worker_thread(client.containers.get, container_id)
         logger.info(f"Stopping container {container.id!r}.")
         await run_sync_in_worker_thread(container.stop, **stop_kwargs)
+
+    return container
+
+
+@task
+async def remove_docker_container(
+    container_id: str,
+    docker_host: Optional[DockerHost] = None,
+    **remove_kwargs: Dict[str, Any],
+) -> Container:
+    """
+    Remove this container. Similar to the docker rm command.
+
+    Args:
+        container_id: The container ID to remove.
+        docker_host: Settings for interacting with a Docker host.
+        **remove_kwargs: Additional keyword arguments to pass to
+            [`client.containers.get(container_id).remove`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.remove).
+
+    Returns:
+        The Docker Container object.
+
+    Examples:
+        Stop a container with an ID that starts wtih "c157".
+        ```
+        from prefect import flow
+        from prefect_docker.containers import remove_docker_container
+
+        @flow
+        def remove_docker_container_flow():
+            container = remove_docker_container(container_id="c157")
+            return container
+
+        remove_docker_container()
+        ```
+    """
+    logger = get_run_logger()
+
+    with (docker_host or DockerHost()).get_client() as client:
+        container = await run_sync_in_worker_thread(client.containers.get, container_id)
+        logger.info(f"Removing container {container.id!r}.")
+        await run_sync_in_worker_thread(container.remove, **remove_kwargs)
 
     return container
