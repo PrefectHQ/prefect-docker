@@ -50,7 +50,7 @@ prefect block register -m prefect_docker
 
 Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
 
-### Pull, create, start, log, stop, and remove Docker container
+### Pull image, and create, start, log, stop, and remove Docker container
 
 ```python
 from prefect import flow, get_run_logger
