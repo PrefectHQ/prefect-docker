@@ -48,5 +48,6 @@ watch:
 nav:
     - Home: index.md
     - Host: host.md
+    - Credentials: credentials.md
     - Containers: containers.md
     - Images: images.md

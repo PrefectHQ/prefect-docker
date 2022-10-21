@@ -9,6 +9,24 @@ from pydantic import Field, SecretStr
 class DockerRegistryCredentials(Block):
     """
     Block used to manage credentials for interacting with a Docker Registry.
+
+    Examples:
+        Log into Docker Registry.
+        ```python
+        from prefect import flow
+        from prefect_docker import DockerHost, DockerRegistryCredentials
+
+        @flow
+        def docker_registry_login_flow():
+            docker_host = DockerHost()
+            docker_registry_credentials = DockerRegistryCredentials(
+                username="my_username",
+                password="my_password",
+                registry_url="registry.hub.docker.com",
+            )
+            with docker_host.get_client() as client:
+                docker_registry_credentials.login(client)
+        ```
     """
 
     _block_type_name = "Docker Registry Credentials"
@@ -36,6 +54,9 @@ class DockerRegistryCredentials(Block):
     async def login(self, client: docker.DockerClient):
         """
         Authenticates a given Docker client with the configured Docker registry.
+
+        Args:
+            client: A Docker Client.
         """
         logger = get_run_logger()
         logger.debug(f"Logging into {self.registry_url}.")
