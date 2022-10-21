@@ -39,7 +39,7 @@ async def create_docker_container(
 
     Examples:
         Create a container with the Prefect image.
-        ```
+        ```python
         from prefect import flow
         from prefect_docker.containers import create_docker_container
 
@@ -90,7 +90,7 @@ async def get_docker_container_logs(
 
     Examples:
         Gets logs from a container with an ID that starts with "c157".
-        ```
+        ```python
         from prefect import flow
         from prefect_docker.containers import get_docker_container_logs
 
@@ -133,7 +133,7 @@ async def start_docker_container(
 
     Examples:
         Start a container with an ID that starts wtih "c157".
-        ```
+        ```python
         from prefect import flow
         from prefect_docker.containers import start_docker_container
 
@@ -175,7 +175,7 @@ async def stop_docker_container(
 
     Examples:
         Stop a container with an ID that starts wtih "c157".
-        ```
+        ```python
         from prefect import flow
         from prefect_docker.containers import stop_docker_container
 
@@ -216,8 +216,8 @@ async def remove_docker_container(
         The Docker Container object.
 
     Examples:
-        Stop a container with an ID that starts wtih "c157".
-        ```
+        Removes a container with an ID that starts wtih "c157".
+        ```python
         from prefect import flow
         from prefect_docker.containers import remove_docker_container
 
