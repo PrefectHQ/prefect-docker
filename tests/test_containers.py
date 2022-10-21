@@ -18,6 +18,8 @@ class TestCreateDockerContainer:
             name="test_name",
             detach=False,
             ports={"2222/tcp": 3333},
+            entrypoint=None,
+            environment=None,
         )
         with disable_run_logger():
             container = await create_docker_container.fn(
