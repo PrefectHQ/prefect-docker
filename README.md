@@ -50,23 +50,41 @@ prefect block register -m prefect_docker
 
 Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
 
-### Write and run a flow
+### Create a Docker container
 
 ```python
 from prefect import flow
-from prefect_docker.tasks import (
-    goodbye_prefect_docker,
-    hello_prefect_docker,
-)
-
+from prefect_docker.containers import create_docker_container
 
 @flow
-def example_flow():
-    hello_prefect_docker
-    goodbye_prefect_docker
-
-example_flow()
+def create_docker_container_flow():
+    container = create_docker_container(
+        image="prefecthq/prefect",
+        command="echo 'hello world!'"
+    )
 ```
+
+### Use a custom Docker Host to create a Docker container.
+```python
+from prefect import flow
+from prefect_docker import DockerHost
+from prefect_docker.containers import create_docker_container
+
+@flow
+def create_docker_container_flow():
+    docker_host = DockerHost(
+        base_url="tcp://127.0.0.1:1234",
+        max_pool_size=4
+    )
+    container = create_docker_container(
+        docker_host=docker_host,
+        image="prefecthq/prefect",
+        command="echo 'hello world!'"
+    )
+
+create_docker_container_flow()
+```
+
 
 ## Resources
 
