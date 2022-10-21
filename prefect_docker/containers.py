@@ -14,6 +14,8 @@ async def create_docker_container(
     command: Optional[Union[str, List[str]]] = None,
     name: Optional[str] = None,
     detach: Optional[bool] = None,
+    entrypoint: Optional[Union[str, List[str]]] = None,
+    environment: Optional[Union[Dict[str, str], List[str]]] = None,
     docker_host: Optional[DockerHost] = None,
     **create_kwargs: Dict[str, Any],
 ) -> Container:
@@ -26,6 +28,9 @@ async def create_docker_container(
         name: The name for this container.
         detach: Run container in the background.
         docker_host: Settings for interacting with a Docker host.
+        entrypoint: The entrypoint for the container.
+        environment: Environment variables to set inside the container,
+            as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].
         **create_kwargs: Additional keyword arguments to pass to
             [`client.containers.create`](https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.create).
 
@@ -58,6 +63,8 @@ async def create_docker_container(
             command=command,
             name=name,
             detach=detach,
+            entrypoint=entrypoint,
+            environment=environment,
             **create_kwargs,
         )
     return container
