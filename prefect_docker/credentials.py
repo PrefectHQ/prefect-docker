@@ -13,19 +13,16 @@ class DockerRegistryCredentials(Block):
     Examples:
         Log into Docker Registry.
         ```python
-        from prefect import flow
         from prefect_docker import DockerHost, DockerRegistryCredentials
 
-        @flow
-        def docker_registry_login_flow():
-            docker_host = DockerHost()
-            docker_registry_credentials = DockerRegistryCredentials(
-                username="my_username",
-                password="my_password",
-                registry_url="registry.hub.docker.com",
-            )
-            with docker_host.get_client() as client:
-                docker_registry_credentials.login(client)
+        docker_host = DockerHost()
+        docker_registry_credentials = DockerRegistryCredentials(
+            username="my_username",
+            password="my_password",
+            registry_url="registry.hub.docker.com",
+        )
+        with docker_host.get_client() as client:
+            docker_registry_credentials.login(client)
         ```
     """
 

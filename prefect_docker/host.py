@@ -43,17 +43,14 @@ class DockerHost(Block):
     Examples:
         Get a Docker Host client.
         ```python
-        from prefect import flow
         from prefect_docker import DockerHost
 
-        @flow
-        def docker_host_get_client_flow():
-            docker_host = DockerHost(
-                base_url="tcp://127.0.0.1:1234",
-                max_pool_size=4
-            )
-            with docker_host.get_client() as client:
-                pass
+        docker_host = DockerHost(
+        base_url="tcp://127.0.0.1:1234",
+            max_pool_size=4
+        )
+        with docker_host.get_client() as client:
+            ... # Use the client for Docker operations
         ```
     """
 
