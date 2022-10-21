@@ -2,17 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://PrefectHQ.github.io/prefect-docker/</loc>
-         <lastmod>2022-08-10</lastmod>
+         <lastmod>2022-10-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://PrefectHQ.github.io/prefect-docker/flows/</loc>
-         <lastmod>2022-08-10</lastmod>
+         <loc>https://PrefectHQ.github.io/prefect-docker/containers/</loc>
+         <lastmod>2022-10-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://PrefectHQ.github.io/prefect-docker/tasks/</loc>
-         <lastmod>2022-08-10</lastmod>
+         <loc>https://PrefectHQ.github.io/prefect-docker/credentials/</loc>
+         <lastmod>2022-10-21</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://PrefectHQ.github.io/prefect-docker/host/</loc>
+         <lastmod>2022-10-21</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://PrefectHQ.github.io/prefect-docker/images/</loc>
+         <lastmod>2022-10-21</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
