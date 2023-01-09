@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- correct type hints for tasks - [#31](https://github.com/PrefectHQ/prefect-docker/issues/31)
+
 ### Security
 
 ## 0.1.0
