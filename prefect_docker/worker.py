@@ -118,9 +118,9 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
         default=None,
         title="Memory Limit",
         description=(
-            "Memory limit of the created container. Accepts float values to enforce "
-            "a limit in bytes or a string with a unit e.g. 100000b, 1000k, 128m, 1g. "
-            "If a string is given without a unit, bytes are assumed."
+            "Memory limit of the created container. Accepts a value "
+            "with a unit identifier (e.g. 100000b, 1000k, 128m, 1g.) "
+            "If a value is given without a unit, bytes are assumed."
         ),
     )
     memswap_limit: Optional[str] = Field(

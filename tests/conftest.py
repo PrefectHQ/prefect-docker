@@ -141,7 +141,6 @@ def mock_docker_registry_credentials():
 
 @pytest.fixture(scope="session")
 def docker_client_with_cleanup(worker_id: str) -> Generator[DockerClient, None, None]:
-    print("Worker ID: ", worker_id)
     client = None
     try:
         client = docker.from_env()
