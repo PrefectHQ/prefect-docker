@@ -31,7 +31,7 @@ jobs:
 
       - name: Run tests
         env:
-          PREFECT_ORION_DATABASE_CONNECTION_URL: "sqlite+aiosqlite:///./prefect-tests.db"
+          PREFECT_API_DATABASE_CONNECTION_URL: "sqlite+aiosqlite:///./prefect-tests.db"
         run: |
-          coverage run --branch -m pytest tests -vv
+          coverage run --branch -m pytest tests -vvv --numprocesses auto --dist loadscope
           coverage report
