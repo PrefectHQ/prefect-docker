@@ -1,6 +1,6 @@
 """Integrations with Docker Images."""
 
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from docker.models.images import Image
 from prefect import get_run_logger, task
@@ -18,7 +18,7 @@ async def pull_docker_image(
     all_tags: bool = False,
     docker_host: Optional[DockerHost] = None,
     docker_registry_credentials: Optional[DockerRegistryCredentials] = None,
-    **pull_kwargs,
+    **pull_kwargs: Dict[str, Any],
 ) -> Union[Image, List[Image]]:
     """
     Pull an image of the given name and return it. Similar to the docker pull command.
