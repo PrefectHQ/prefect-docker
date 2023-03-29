@@ -22,12 +22,11 @@ import re
 import sys
 import urllib.parse
 import warnings
-from typing import TYPE_CHECKING, Dict, Generator, List, Literal, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, Generator, List, Optional, Tuple
 
 import anyio.abc
 import packaging.version
 import prefect
-from anyio import run_sync_in_worker_thread
 from prefect.docker import (
     format_outlier_version_name,
     get_prefect_image_name,
@@ -39,9 +38,11 @@ from prefect.experimental.workers.base import (
     BaseWorkerResult,
 )
 from prefect.settings import PREFECT_API_URL
+from prefect.utilities.asyncutils import run_sync_in_worker_thread
 from prefect.utilities.importtools import lazy_import
 from pydantic import Field, validator
 from slugify import slugify
+from typing_extensions import Literal
 
 if TYPE_CHECKING:
     import docker
@@ -82,8 +83,8 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
         "If not set, the latest Prefect image will be used.",
         example="docker.io/prefecthq/prefect:2-latest",
     )
-    image_pull_policy: Literal["IfNotPresent", "Always", "Never"] = Field(
-        default="IfNotPresent",
+    image_pull_policy: Optional[Literal["IfNotPresent", "Always", "Never"]] = Field(
+        default=None,
         description="The image pull policy to use when pulling images.",
     )
     networks: List[str] = Field(
@@ -191,7 +192,7 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
             or None
         )
 
-    def _update_api_url_if_local(self):
+    def _base_environment(self):
         """
         If the API URL has been set update the value to ensure connectivity
         when using a bridge network by updating local connections to use the
@@ -199,17 +200,19 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
         is available already.
         """
 
+        base_env = super()._base_environment()
         network_mode = self.get_network_mode()
         if (
-            "PREFECT_API_URL" in self.env
-            and self.env["PREFECT_API_URL"] is not None
+            "PREFECT_API_URL" in base_env
+            and base_env["PREFECT_API_URL"] is not None
             and network_mode != "host"
         ):
-            self.env["PREFECT_API_URL"] = (
-                self.env["PREFECT_API_URL"]
+            base_env["PREFECT_API_URL"] = (
+                base_env["PREFECT_API_URL"]
                 .replace("localhost", "host.docker.internal")
                 .replace("127.0.0.1", "host.docker.internal")
             )
+        return base_env
 
     def prepare_for_flow_run(
         self,
@@ -228,7 +231,6 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
             {**self.labels, **CONTAINER_LABELS}
         )
         self.name = self._slugify_container_name()
-        self._update_api_url_if_local
 
     def get_network_mode(self) -> Optional[str]:
         """
@@ -330,25 +332,6 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
                 return ImagePullPolicy.ALWAYS
             return ImagePullPolicy.IF_NOT_PRESENT
         return ImagePullPolicy(self.image_pull_policy)
-
-    def should_pull_image(self, docker_client: "DockerClient") -> bool:
-        """
-        Decide whether we need to pull the Docker image.
-        """
-        image_pull_policy = self._determine_image_pull_policy()
-
-        if image_pull_policy is ImagePullPolicy.ALWAYS:
-            return True
-        elif image_pull_policy is ImagePullPolicy.NEVER:
-            return False
-        elif image_pull_policy is ImagePullPolicy.IF_NOT_PRESENT:
-            try:
-                # NOTE: images.get() wants the tag included with the image
-                # name, while images.pull() wants them split.
-                docker_client.images.get(self.image)
-            except docker.errors.ImageNotFound:
-                return True
-        return False
 
 
 class DockerWorkerResult(BaseWorkerResult):
@@ -460,7 +443,7 @@ class DockerWorker(BaseWorker):
             docker_client, configuration
         )
 
-        if configuration.should_pull_image(docker_client):
+        if self._should_pull_image(docker_client, configuration=configuration):
             self._logger.info(f"Pulling image {configuration.image!r}...")
             self._pull_image(docker_client, configuration)
 
@@ -621,6 +604,4 @@ class DockerWorker(BaseWorker):
         self._logger.info(
             f"Docker container {container.name!r} has status {container.status!r}"
         )
-        return container
-
         return container
