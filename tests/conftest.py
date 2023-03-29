@@ -5,13 +5,14 @@ from contextlib import contextmanager
 from typing import Generator
 from unittest.mock import MagicMock, patch
 
-from prefect.docker import IMAGE_LABELS, docker_client, silence_docker_warnings
+from prefect.docker import IMAGE_LABELS, silence_docker_warnings
 from prefect.testing.fixtures import *  # noqa
 from prefect.testing.utilities import prefect_test_harness
 
 from prefect_docker.worker import CONTAINER_LABELS
 
 with silence_docker_warnings():
+    import docker
     from docker import DockerClient
     from docker.models.containers import Container
     from docker.errors import APIError
@@ -139,21 +140,16 @@ def mock_docker_registry_credentials():
 
 
 @pytest.fixture(scope="session")
-def docker(worker_id: str) -> Generator[DockerClient, None, None]:
-    context = docker_client()
+def docker_client_with_cleanup(worker_id: str) -> Generator[DockerClient, None, None]:
+    print("Worker ID: ", worker_id)
+    client = None
     try:
-        client = context.__enter__()
-    except Exception as exc:
-        raise RuntimeError(
-            "Failed to create Docker client. Exclude tests that require Docker with "
-            "'--exclude-service docker'."
-        ) from exc
-
-    try:
+        client = docker.from_env()
         with cleanup_all_new_docker_objects(client, worker_id):
             yield client
     finally:
-        context.__exit__(*sys.exc_info())
+        if client is not None:
+            client.close()
 
 
 @contextmanager

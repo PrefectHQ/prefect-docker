@@ -831,7 +831,9 @@ async def test_does_not_warn_about_gateway_if_not_using_linux(
 
 
 async def test_container_result(
-    docker: "DockerClient", flow_run, default_docker_worker_job_configuration
+    docker_client_with_cleanup: "DockerClient",
+    flow_run,
+    default_docker_worker_job_configuration,
 ):
     async with DockerWorker(work_pool_name="test") as worker:
         result = await worker.run(
@@ -841,12 +843,14 @@ async def test_container_result(
         assert result.status_code == 0
         assert result.identifier
         _, container_id = worker._parse_infrastructure_pid(result.identifier)
-        container = docker.containers.get(container_id)
+        container = docker_client_with_cleanup.containers.get(container_id)
         assert container is not None
 
 
 async def test_container_auto_remove(
-    docker: "DockerClient", flow_run, default_docker_worker_job_configuration
+    docker_client_with_cleanup: "DockerClient",
+    flow_run,
+    default_docker_worker_job_configuration,
 ):
     from docker.errors import NotFound
 
@@ -861,11 +865,13 @@ async def test_container_auto_remove(
         assert result.identifier
         with pytest.raises(NotFound):
             _, container_id = worker._parse_infrastructure_pid(result.identifier)
-            docker.containers.get(container_id)
+            docker_client_with_cleanup.containers.get(container_id)
 
 
 async def test_container_metadata(
-    docker: "DockerClient", flow_run, default_docker_worker_job_configuration
+    docker_client_with_cleanup: "DockerClient",
+    flow_run,
+    default_docker_worker_job_configuration,
 ):
     default_docker_worker_job_configuration.name = "test-container-name"
     default_docker_worker_job_configuration.labels = {"test.foo": "a", "test.bar": "b"}
@@ -876,7 +882,7 @@ async def test_container_metadata(
         )
 
         _, container_id = worker._parse_infrastructure_pid(result.identifier)
-    container: "Container" = docker.containers.get(container_id)
+    container: "Container" = docker_client_with_cleanup.containers.get(container_id)
     assert container.name == "test-container-name"
     assert container.labels["test.foo"] == "a"
     assert container.labels["test.bar"] == "b"
@@ -887,7 +893,9 @@ async def test_container_metadata(
 
 
 async def test_container_name_collision(
-    docker: "DockerClient", flow_run, default_docker_worker_job_configuration
+    docker_client_with_cleanup: "DockerClient",
+    flow_run,
+    default_docker_worker_job_configuration,
 ):
     # Generate a unique base name to avoid collissions with existing images
     base_name = uuid.uuid4().hex
@@ -901,19 +909,25 @@ async def test_container_name_collision(
         )
 
         _, container_id = worker._parse_infrastructure_pid(result.identifier)
-        created_container: "Container" = docker.containers.get(container_id)
+        created_container: "Container" = docker_client_with_cleanup.containers.get(
+            container_id
+        )
         assert created_container.name == base_name
 
         result = await worker.run(
             flow_run=flow_run, configuration=default_docker_worker_job_configuration
         )
         _, container_id = worker._parse_infrastructure_pid(result.identifier)
-        created_container: "Container" = docker.containers.get(container_id)
+        created_container: "Container" = docker_client_with_cleanup.containers.get(
+            container_id
+        )
         assert created_container.name == base_name + "-1"
 
 
 async def test_container_result_async(
-    docker: "DockerClient", flow_run, default_docker_worker_job_configuration
+    docker_client_with_cleanup: "DockerClient",
+    flow_run,
+    default_docker_worker_job_configuration,
 ):
     async with DockerWorker(work_pool_name="test") as worker:
         result = await worker.run(
@@ -923,7 +937,7 @@ async def test_container_result_async(
         assert result.status_code == 0
         assert result.identifier
         _, container_id = worker._parse_infrastructure_pid(result.identifier)
-        container = docker.containers.get(container_id)
+        container = docker_client_with_cleanup.containers.get(container_id)
         assert container is not None
 
 
