@@ -51,6 +51,7 @@ nav:
     - Credentials: credentials.md
     - Containers: containers.md
     - Images: images.md
+    - Worker: worker.md
 extra:
     social:
         - icon: fontawesome/brands/slack
