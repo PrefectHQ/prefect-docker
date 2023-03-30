@@ -1,9 +1,9 @@
 """
-<span class="badge-api experimental"/>
+<span class="badge-api beta"/>
 
 Module containing the Docker worker used for executing flow runs as Docker containers.
 
-Note this module is **experimental**. The interfaces within may change without notice.
+Note this module is in **beta**. The interfaces within may change without notice.
 
 To start a Docker worker, run the following command:
 
