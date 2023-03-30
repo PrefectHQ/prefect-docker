@@ -1,11 +1,12 @@
 import uuid
-from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 
 import anyio.abc
 import docker
 import docker.models.containers
 import pytest
+from docker import DockerClient
+from docker.models.containers import Container
 from prefect.client.schemas import FlowRun
 from prefect.docker import get_prefect_image_name
 from prefect.settings import (
@@ -21,11 +22,6 @@ from prefect_docker.worker import (
     DockerWorker,
     DockerWorkerJobConfiguration,
 )
-
-if TYPE_CHECKING:
-    from docker import DockerClient
-    from docker.models.containers import Container
-
 
 FAKE_CONTAINER_ID = "fake-id"
 FAKE_BASE_URL = "http+docker://my-url"

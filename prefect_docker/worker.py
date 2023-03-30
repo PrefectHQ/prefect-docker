@@ -22,11 +22,16 @@ import re
 import sys
 import urllib.parse
 import warnings
-from typing import TYPE_CHECKING, Dict, Generator, List, Optional, Tuple
+from typing import Dict, Generator, List, Optional, Tuple
 
 import anyio.abc
+import docker
+import docker.errors
 import packaging.version
 import prefect
+from docker import DockerClient
+from docker.models.containers import Container
+from prefect.client.schemas import FlowRun
 from prefect.docker import (
     format_outlier_version_name,
     get_prefect_image_name,
@@ -37,22 +42,13 @@ from prefect.experimental.workers.base import (
     BaseWorker,
     BaseWorkerResult,
 )
+from prefect.server.schemas.core import Flow
+from prefect.server.schemas.responses import DeploymentResponse
 from prefect.settings import PREFECT_API_URL
 from prefect.utilities.asyncutils import run_sync_in_worker_thread
-from prefect.utilities.importtools import lazy_import
 from pydantic import Field, validator
 from slugify import slugify
 from typing_extensions import Literal
-
-if TYPE_CHECKING:
-    import docker
-    from docker import DockerClient
-    from docker.models.containers import Container
-    from prefect.client.schemas import FlowRun
-    from prefect.server.schemas.core import Flow
-    from prefect.server.schemas.responses import DeploymentResponse
-else:
-    docker = lazy_import("docker")
 
 CONTAINER_LABELS = {
     "io.prefect.version": prefect.__version__,
@@ -609,13 +605,12 @@ class DockerWorker(BaseWorker):
         name = original_name = kwargs.pop("name")
 
         while not container:
-            from docker.errors import APIError
 
             try:
                 display_name = repr(name) if name else "with auto-generated name"
                 self._logger.info(f"Creating Docker container {display_name}...")
                 container = docker_client.containers.create(name=name, **kwargs)
-            except APIError as exc:
+            except docker.errors.APIError as exc:
                 if "Conflict" in str(exc) and "container name" in str(exc):
                     self._logger.info(
                         f"Docker container name {display_name} already exists; "
