@@ -67,7 +67,6 @@ class ImagePullPolicy(enum.Enum):
     NEVER = "Never"
 
 
-# TODO: Document attributes
 class DockerWorkerJobConfiguration(BaseJobConfiguration):
     """
     Configuration class used by the Docker worker.
@@ -75,6 +74,32 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
     An instance of this class is passed to the Docker worker's `run` method
     for each flow run. It contains all the information necessary to execute the
     flow run as a Docker container.
+
+    Attributes:
+        name: The name to give to created Docker containers.
+        command: The command executed in created Docker containers to kick off
+            flow run execution.
+        env: The environment variables to set in created Docker containers.
+        labels: The labels to set on created Docker containers.
+        image: The image reference of a container image to use for created jobs.
+            If not set, the latest Prefect image will be used.
+        image_pull_policy: The image pull policy to use when pulling images.
+        networks: Docker networks that created containers should be connected to.
+        network_mode: The network mode for the created containers (e.g. host, bridge).
+            If 'networks' is set, this cannot be set.
+        auto_remove: If set, containers will be deleted on completion.
+        volumes: Docker volumes that should be mounted in created containers.
+        stream_output: If set, the output from created containers will be streamed
+            to local standard output.
+        mem_limit: Memory limit of created containers. Accepts a value
+            with a unit identifier (e.g. 100000b, 1000k, 128m, 1g.) If a value is
+            given without a unit, bytes are assumed.
+        memswap_limit: Total memory (memory + swap), -1 to disable swap. Should only be
+            set if `mem_limit` is also set. If `mem_limit` is set, this defaults to
+            allowing the container to use as much swap as memory. For example, if
+            `mem_limit` is 300m and `memswap_limit` is not set, containers can use
+            600m in total of memory and swap.
+        privileged: Give extended privileges to created containers.
     """
 
     image: str = Field(
@@ -89,7 +114,7 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
     )
     networks: List[str] = Field(
         default_factory=list,
-        description=("Docker networks that created containers should be connected to."),
+        description="Docker networks that created containers should be connected to.",
     )
     network_mode: Optional[str] = Field(
         default=None,
@@ -100,11 +125,11 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
     )
     auto_remove: bool = Field(
         default=False,
-        description="If set, containers will be removed on completion.",
+        description="If set, containers will be deleted on completion.",
     )
     volumes: List[str] = Field(
         default_factory=list,
-        description=("A list of volume to mount into created containers."),
+        description="A list of volume to mount into created containers.",
         example=["/my/local/path:/path/in/container"],
     )
     stream_output: bool = Field(
@@ -118,7 +143,7 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
         default=None,
         title="Memory Limit",
         description=(
-            "Memory limit of the created container. Accepts a value "
+            "Memory limit of created containers. Accepts a value "
             "with a unit identifier (e.g. 100000b, 1000k, 128m, 1g.) "
             "If a value is given without a unit, bytes are assumed."
         ),
@@ -130,14 +155,14 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
             "Total memory (memory + swap), -1 to disable swap. Should only be "
             "set if `mem_limit` is also set. If `mem_limit` is set, this defaults to"
             "allowing the container to use as much swap as memory. For example, if "
-            "`mem_limit` is 300m and `memswap_limit` is not set, the container can use "
+            "`mem_limit` is 300m and `memswap_limit` is not set, containers can use "
             "600m in total of memory and swap."
         ),
     )
 
     privileged: bool = Field(
         default=False,
-        description="Give extended privileges to this container.",
+        description="Give extended privileges to created container.",
     )
 
     @validator("volumes")
