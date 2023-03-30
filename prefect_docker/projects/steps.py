@@ -20,7 +20,6 @@ class BuildDockerImageResult(TypedDict):
 def build_docker_image(
     image_name: str,
     dockerfile: str = "Dockerfile",
-    auto_build: bool = False,
     tag: Optional[str] = None,
     push: bool = True,
 ) -> BuildDockerImageResult:
@@ -39,7 +38,8 @@ def build_docker_image(
         BuildDockerImageResult: A dictionary containing the image name and tag of the
             built image.
     """
-    if dockerfile == "auto":
+    auto_build = dockerfile == "auto"
+    if auto_build:
         lines = []
         base_image = get_prefect_image_name()
         lines.append(f"FROM {base_image}")
@@ -68,7 +68,7 @@ def build_docker_image(
             stream_progress_to=sys.stdout,
         )
     finally:
-        if auto_build and dockerfile is not None:
+        if auto_build:
             os.unlink(dockerfile)
 
     if not tag:
