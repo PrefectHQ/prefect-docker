@@ -10,6 +10,11 @@ import pendulum
 from docker.models.images import Image
 from prefect.docker import build_image, docker_client, get_prefect_image_name
 from prefect.utilities.slugify import slugify
+from typing_extensions import TypedDict
+
+
+class BuildDockerImageResult(TypedDict):
+    image_name: str
 
 
 def build_docker_image(
@@ -18,27 +23,23 @@ def build_docker_image(
     auto_build: bool = False,
     tag: Optional[str] = None,
     push: bool = True,
-) -> dict:
+) -> BuildDockerImageResult:
     """
     Builds a Docker image for a Prefect deployment.
 
     Args:
         image_name: The name of the Docker image to build, including the registry and
-            repository (e.g., "myregistry/myimage").
-        dockerfile: The path to the Dockerfile used to build the image (default is
-            "Dockerfile" in the current directory).
-        auto_build: Whether to generate a Dockerfile automatically from the current
-            directory (default is False).
-        tag: The tag to apply to the built image (default is a slugified timestamp in
-            UTC).
-        push: Whether to push the built image to the registry (default is
-            True).
+            repository.
+        dockerfile: The path to the Dockerfile used to build the image. If "auto" is
+            passed, a temporary Dockerfile will be created to build the image.
+        tag: The tag to apply to the built image.
+        push: Whether to push the built image to the registry.
 
     Returns:
-        dict: A dictionary containing the image name and tag of the built image (e.g.,
-            {"image_name": "myregistry/myimage:2023-03-30T12-34-56Z"}).
+        BuildDockerImageResult: A dictionary containing the image name and tag of the
+            built image.
     """
-    if auto_build:
+    if dockerfile == "auto":
         lines = []
         base_image = get_prefect_image_name()
         lines.append(f"FROM {base_image}")
@@ -50,11 +51,14 @@ def build_docker_image(
         if Path("requirements.txt").exists():
             lines.append("RUN pip install -r requirements.txt")
 
-        if Path(dockerfile).exists():
+        temp_dockerfile = Path("Dockerfile")
+        if Path(temp_dockerfile).exists():
             raise ValueError("Dockerfile already exists.")
 
-        with Path(dockerfile).open("w") as f:
+        with Path(temp_dockerfile).open("w") as f:
             f.writelines(line + "\n" for line in lines)
+
+        dockerfile = str(temp_dockerfile)
 
     try:
         image_id = build_image(
@@ -89,4 +93,4 @@ def build_docker_image(
             finally:
                 client.api.remove_image(f"{image_name}:{tag}", noprune=True)
 
-    return dict(image_name=f"{image_name}:{tag}")
+    return {"image_name": f"{image_name}:{tag}"}
