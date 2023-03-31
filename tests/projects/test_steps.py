@@ -160,13 +160,14 @@ def test_build_docker_image_raises_with_auto_and_existing_dockerfile():
         Path("Dockerfile").unlink()
 
 
-def test_real_auto_dockerfile_build():
-    client = docker.from_env()
+def test_real_auto_dockerfile_build(docker_client_with_cleanup):
     try:
         result = build_docker_image(
             image_name="local/repo", tag="test", dockerfile="auto", push=False
         )
-        image: docker.models.images.Image = client.images.get(result["image_name"])
+        image: docker.models.images.Image = docker_client_with_cleanup.images.get(
+            result["image_name"]
+        )
         assert image
 
         cases = [
@@ -179,7 +180,7 @@ def test_real_auto_dockerfile_build():
         ]
 
         for case in cases:
-            output = client.containers.run(
+            output = docker_client_with_cleanup.containers.run(
                 image=result["image_name"],
                 command=case["command"],
                 labels=["prefect-docker-test"],
@@ -188,7 +189,11 @@ def test_real_auto_dockerfile_build():
             assert case["expected"] in output.decode()
 
     finally:
-        client.containers.prune(filters={"label": "prefect-docker-test"})
-        image = client.images.get("local/repo:test")
+        docker_client_with_cleanup.containers.prune(
+            filters={"label": "prefect-docker-test"}
+        )
+        image = docker_client_with_cleanup.images.get("local/repo:test")
         if image:
-            client.images.remove(image="local/repo:test", noprune=True)
+            docker_client_with_cleanup.images.remove(
+                image="local/repo:test", force=True
+            )
