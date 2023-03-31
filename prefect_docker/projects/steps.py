@@ -14,6 +14,13 @@ from typing_extensions import TypedDict
 
 
 class BuildDockerImageResult(TypedDict):
+    """
+    The result of a `build_docker_image` step.
+
+    Attributes:
+        image_name: The name and tag of the built image.
+    """
+
     image_name: str
 
 
@@ -26,6 +33,9 @@ def build_docker_image(
     """
     Builds a Docker image for a Prefect deployment.
 
+    Can be used within the `prefect.yaml` file of a Prefect project to build a Docker
+    image prior to creating or updating a deployment.
+
     Args:
         image_name: The name of the Docker image to build, including the registry and
             repository.
@@ -35,8 +45,38 @@ def build_docker_image(
         push: Whether to push the built image to the registry.
 
     Returns:
-        BuildDockerImageResult: A dictionary containing the image name and tag of the
+        A dictionary containing the image name and tag of the
             built image.
+
+    Examples:
+        Build and push a Docker image prior to creating a deployment:
+        ```yaml
+        build:
+            - prefect_docker.projects.steps.build_docker_image:
+                requires: prefect-docker
+                image_name: repo-name/image-name
+                tag: dev
+        ```
+
+        Build a Docker image without pushing it to the registry:
+        ```yaml
+        build:
+            - prefect_docker.projects.steps.build_docker_image:
+                requires: prefect-docker
+                image_name: repo-name/image-name
+                tag: dev
+                push: false
+        ```
+
+        Build a Docker image using a temporary Dockerfile:
+        ```yaml
+        build:
+            - prefect_docker.projects.steps.build_docker_image:
+                requires: prefect-docker
+                image_name: repo-name/image-name
+                tag: dev
+                dockerfile: auto
+        ```
     """
     auto_build = dockerfile == "auto"
     if auto_build:
@@ -76,10 +116,12 @@ def build_docker_image(
 
     with docker_client() as client:
         image: Image = client.images.get(image_id)
-        image.tag(image_name, tag=tag)
+        image.tag(repository=image_name, tag=tag)
 
         if push:
-            events = client.api.push(image_name, tag=tag, stream=True, decode=True)
+            events = client.api.push(
+                repository=image_name, tag=tag, stream=True, decode=True
+            )
             try:
                 for event in events:
                     if "status" in event:
@@ -91,6 +133,6 @@ def build_docker_image(
                     elif "error" in event:
                         raise OSError(event["error"])
             finally:
-                client.api.remove_image(f"{image_name}:{tag}", noprune=True)
+                client.api.remove_image(image=f"{image_name}:{tag}", noprune=True)
 
     return {"image_name": f"{image_name}:{tag}"}
