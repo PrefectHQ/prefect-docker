@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Experimental `DockerWorker` for executing flow runs within Docker containers - [#35](https://github.com/PrefectHQ/prefect-kubernetes/pull/35)
+- Beta `DockerWorker` for executing flow runs within Docker containers - [#35](https://github.com/PrefectHQ/prefect-docker/pull/35)
+- Beta 'docker_build_image' project step for building Docker images prior to creating a deployment - [#38](https://github.com/PrefectHQ/prefect-docker/pull/38)
+
 
 ### Changed
 

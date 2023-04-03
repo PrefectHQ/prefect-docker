@@ -1,16 +1,17 @@
-pytest
-pytest-xdist
 black
 flake8
-mypy
+interrogate
+isort
 mkdocs
+mkdocs-gen-files
 mkdocs-material
 mkdocstrings[python]
-isort
-pre-commit
-pytest-asyncio
 mock; python_version < '3.8'
-mkdocs-gen-files
-interrogate
-pytest-cov
+mypy
 pillow
+pre-commit
+pytest
+pytest-asyncio
+pytest-cov
+pytest-timeout
+pytest-xdist
