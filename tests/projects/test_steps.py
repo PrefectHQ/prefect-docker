@@ -119,6 +119,7 @@ def test_build_docker_image(
     result = build_docker_image(**kwargs)
 
     assert result["image_name"] == expected_image_name
+    assert result["image_tag"] == tag
 
     if dockerfile == "auto":
         auto_build = True

@@ -19,9 +19,11 @@ class BuildDockerImageResult(TypedDict):
 
     Attributes:
         image_name: The name and tag of the built image.
+        image_tag: The tag of the built image.
     """
 
     image_name: str
+    image_tag: str
 
 
 def build_docker_image(
@@ -135,4 +137,4 @@ def build_docker_image(
             finally:
                 client.api.remove_image(image=f"{image_name}:{tag}", noprune=True)
 
-    return {"image_name": f"{image_name}:{tag}"}
+    return {"image_name": f"{image_name}:{tag}", "image_tag": tag}
