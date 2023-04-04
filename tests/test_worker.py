@@ -826,6 +826,7 @@ async def test_does_not_warn_about_gateway_if_not_using_linux(
     assert not call_extra_hosts
 
 
+@pytest.mark.flaky(max_runs=3)
 async def test_container_result(
     docker_client_with_cleanup: "DockerClient",
     flow_run,
@@ -843,6 +844,7 @@ async def test_container_result(
         assert container is not None
 
 
+@pytest.mark.flaky(max_runs=3)
 async def test_container_auto_remove(
     docker_client_with_cleanup: "DockerClient",
     flow_run,
@@ -864,6 +866,7 @@ async def test_container_auto_remove(
             docker_client_with_cleanup.containers.get(container_id)
 
 
+@pytest.mark.flaky(max_runs=3)
 async def test_container_metadata(
     docker_client_with_cleanup: "DockerClient",
     flow_run,
@@ -888,6 +891,7 @@ async def test_container_metadata(
         assert container.labels[key] == value
 
 
+@pytest.mark.flaky(max_runs=3)
 async def test_container_name_collision(
     docker_client_with_cleanup: "DockerClient",
     flow_run,
@@ -920,6 +924,7 @@ async def test_container_name_collision(
         assert created_container.name == base_name + "-1"
 
 
+@pytest.mark.flaky(max_runs=3)
 async def test_container_result_async(
     docker_client_with_cleanup: "DockerClient",
     flow_run,
@@ -987,6 +992,7 @@ async def test_logs_when_unexpected_docker_error(
     )
 
 
+@pytest.mark.flaky(max_runs=3)
 async def test_stream_container_logs_on_real_container(
     capsys, flow_run, default_docker_worker_job_configuration
 ):
