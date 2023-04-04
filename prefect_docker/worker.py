@@ -31,16 +31,12 @@ import packaging.version
 import prefect
 from docker import DockerClient
 from docker.models.containers import Container
+from packaging import version
 from prefect.client.schemas import FlowRun
 from prefect.docker import (
     format_outlier_version_name,
     get_prefect_image_name,
     parse_image_tag,
-)
-from prefect.experimental.workers.base import (
-    BaseJobConfiguration,
-    BaseWorker,
-    BaseWorkerResult,
 )
 from prefect.server.schemas.core import Flow
 from prefect.server.schemas.responses import DeploymentResponse
@@ -49,6 +45,17 @@ from prefect.utilities.asyncutils import run_sync_in_worker_thread
 from pydantic import Field, validator
 from slugify import slugify
 from typing_extensions import Literal
+
+# TODO: Remove this after next prefect release
+if version.parse(prefect.__version__) <= version.parse("2.9.0"):
+    from prefect.experimental.workers.base import (
+        BaseJobConfiguration,
+        BaseWorker,
+        BaseWorkerResult,
+    )
+else:
+    from prefect.workers.base import BaseJobConfiguration, BaseWorker, BaseWorkerResult
+
 
 CONTAINER_LABELS = {
     "io.prefect.version": prefect.__version__,
