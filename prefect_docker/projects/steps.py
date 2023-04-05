@@ -4,7 +4,7 @@ Core set of steps for specifying a Prefect project build step.
 import os
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 
 import pendulum
 from docker.models.images import Image
@@ -31,6 +31,7 @@ def build_docker_image(
     dockerfile: str = "Dockerfile",
     tag: Optional[str] = None,
     push: bool = True,
+    credentials: Optional[Dict] = None,
 ) -> BuildDockerImageResult:
     """
     Builds a Docker image for a Prefect deployment.
@@ -45,6 +46,8 @@ def build_docker_image(
             passed, a temporary Dockerfile will be created to build the image.
         tag: The tag to apply to the built image.
         push: Whether to push the built image to the registry.
+        credentials: A dictionary containing the username, password, and URL for the
+            registry to push the image to.
 
     Returns:
         A dictionary containing the image name and tag of the
@@ -79,7 +82,19 @@ def build_docker_image(
                 tag: dev
                 dockerfile: auto
         ```
-    """
+
+        Build a Docker image using a temporary Dockerfile and push it to a private
+        registry:
+        ```yaml
+        build:
+            - prefect_docker.projects.steps.build_docker_image:
+                requires: prefect-docker
+                image_name: repo-name/image-name
+                tag: dev
+                dockerfile: auto
+                credentials: "{{ prefect.block.docker-registry-credentials.dev-registry }}"
+        ```
+    """  # noqa
     auto_build = dockerfile == "auto"
     if auto_build:
         lines = []
@@ -117,6 +132,13 @@ def build_docker_image(
         tag = slugify(pendulum.now("utc").isoformat())
 
     with docker_client() as client:
+        if credentials is not None:
+            client.login(
+                username=credentials.get("username"),
+                password=credentials.get("password"),
+                registry=credentials.get("registry_url"),
+                reauth=credentials.get("reauth", True),
+            )
         image: Image = client.images.get(image_id)
         image.tag(repository=image_name, tag=tag)
 
