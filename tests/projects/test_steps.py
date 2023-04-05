@@ -101,6 +101,19 @@ def mock_pendulum(monkeypatch):
             {"image_name": "registry/repo", "dockerfile": "auto"},
             f"registry/repo:{FAKE_DEFAULT_TAG}",
         ),
+        (
+            {
+                "image_name": "registry/repo",
+                "dockerfile": "auto",
+                "credentials": {
+                    "username": "user",
+                    "password": "pass",
+                    "registry_url": "https://registry.com",
+                    "reauth": True,
+                },
+            },
+            f"registry/repo:{FAKE_DEFAULT_TAG}",
+        ),
     ],
 )
 def test_build_docker_image(
@@ -116,6 +129,7 @@ def test_build_docker_image(
     dockerfile = kwargs.get("dockerfile", "Dockerfile")
     tag = kwargs.get("tag", FAKE_DEFAULT_TAG)
     push = kwargs.get("push", True)
+    credentials = kwargs.get("credentials", None)
     result = build_docker_image(**kwargs)
 
     assert result["image_name"] == expected_image_name
@@ -150,6 +164,16 @@ def test_build_docker_image(
 
     if auto_build:
         assert not Path("Dockerfile").exists()
+
+    if credentials:
+        mock_docker_client.login.assert_called_once_with(
+            username=credentials["username"],
+            password=credentials["password"],
+            registry=credentials["registry_url"],
+            reauth=credentials.get("reauth", True),
+        )
+    else:
+        mock_docker_client.login.assert_not_called()
 
 
 def test_build_docker_image_raises_with_auto_and_existing_dockerfile():
