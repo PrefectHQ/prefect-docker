@@ -531,7 +531,7 @@
 
   <div class="doc doc-contents first">
   
-      <p>Core set of steps for specifying a Prefect project build step.</p>
+      <p>Prefect project steps for building and pushing Docker images.</p>
 
   
 
@@ -579,6 +579,13 @@
           </td>
           <td><p>The name and tag of the built image.</p></td>
         </tr>
+        <tr>
+          <td><code>image_tag</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>The tag of the built image.</p></td>
+        </tr>
     </tbody>
   </table>
 
@@ -593,15 +600,19 @@
 <span class="normal">21</span>
 <span class="normal">22</span>
 <span class="normal">23</span>
-<span class="normal">24</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BuildDockerImageResult</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BuildDockerImageResult</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The result of a `build_docker_image` step.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        image_name: The name and tag of the built image.</span>
+<span class="sd">        image_tag: The tag of the built image.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">image_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">image_tag</span><span class="p">:</span> <span class="nb">str</span>
 </code></pre></div></td></tr></table></div>
         </details>
 
@@ -695,6 +706,17 @@ passed, a temporary Dockerfile will be created to build the image.</p></td>
                 <code>True</code>
           </td>
         </tr>
+        <tr>
+          <td><code>credentials</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>]</code>
+          </td>
+          <td><p>A dictionary containing the username, password, and URL for the
+registry to push the image to.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
     </tbody>
   </table>
 
@@ -741,12 +763,20 @@ built image.</p></td>
 <span class="w">        </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dev</span>
 <span class="w">        </span><span class="nt">dockerfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span>
 </code></pre></div></p>
+<p>Build a Docker image using a temporary Dockerfile and push it to a private
+registry:
+<div class="highlight"><pre><span></span><code><span class="nt">build</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">prefect_docker.projects.steps.build_docker_image</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">requires</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prefect-docker</span>
+<span class="w">        </span><span class="nt">image_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">repo-name/image-name</span>
+<span class="w">        </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dev</span>
+<span class="w">        </span><span class="nt">dockerfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">auto</span>
+<span class="w">        </span><span class="nt">credentials</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">prefect.block.docker-registry-credentials.dev-registry</span><span class="nv"> </span><span class="s">}}&quot;</span>
+</code></pre></div></p>
 
       <details class="quote">
         <summary>Source code in <code>prefect_docker/projects/steps.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 27</span>
-<span class="normal"> 28</span>
-<span class="normal"> 29</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 29</span>
 <span class="normal"> 30</span>
 <span class="normal"> 31</span>
 <span class="normal"> 32</span>
@@ -855,11 +885,36 @@ built image.</p></td>
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span>
-<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">build_docker_image</span><span class="p">(</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">build_docker_image</span><span class="p">(</span>
     <span class="n">image_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">dockerfile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Dockerfile&quot;</span><span class="p">,</span>
     <span class="n">tag</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">push</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">credentials</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BuildDockerImageResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Builds a Docker image for a Prefect deployment.</span>
@@ -874,6 +929,8 @@ built image.</p></td>
 <span class="sd">            passed, a temporary Dockerfile will be created to build the image.</span>
 <span class="sd">        tag: The tag to apply to the built image.</span>
 <span class="sd">        push: Whether to push the built image to the registry.</span>
+<span class="sd">        credentials: A dictionary containing the username, password, and URL for the</span>
+<span class="sd">            registry to push the image to.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A dictionary containing the image name and tag of the</span>
@@ -908,7 +965,19 @@ built image.</p></td>
 <span class="sd">                tag: dev</span>
 <span class="sd">                dockerfile: auto</span>
 <span class="sd">        ```</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="sd">        Build a Docker image using a temporary Dockerfile and push it to a private</span>
+<span class="sd">        registry:</span>
+<span class="sd">        ```yaml</span>
+<span class="sd">        build:</span>
+<span class="sd">            - prefect_docker.projects.steps.build_docker_image:</span>
+<span class="sd">                requires: prefect-docker</span>
+<span class="sd">                image_name: repo-name/image-name</span>
+<span class="sd">                tag: dev</span>
+<span class="sd">                dockerfile: auto</span>
+<span class="sd">                credentials: &quot;{{ prefect.block.docker-registry-credentials.dev-registry }}&quot;</span>
+<span class="sd">        ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
     <span class="n">auto_build</span> <span class="o">=</span> <span class="n">dockerfile</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span>
     <span class="k">if</span> <span class="n">auto_build</span><span class="p">:</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
@@ -946,6 +1015,13 @@ built image.</p></td>
         <span class="n">tag</span> <span class="o">=</span> <span class="n">slugify</span><span class="p">(</span><span class="n">pendulum</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="s2">&quot;utc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">())</span>
 
     <span class="k">with</span> <span class="n">docker_client</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">credentials</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span>
+                <span class="n">username</span><span class="o">=</span><span class="n">credentials</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">),</span>
+                <span class="n">password</span><span class="o">=</span><span class="n">credentials</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">),</span>
+                <span class="n">registry</span><span class="o">=</span><span class="n">credentials</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;registry_url&quot;</span><span class="p">),</span>
+                <span class="n">reauth</span><span class="o">=</span><span class="n">credentials</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reauth&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="p">)</span>
         <span class="n">image</span><span class="p">:</span> <span class="n">Image</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">image_id</span><span class="p">)</span>
         <span class="n">image</span><span class="o">.</span><span class="n">tag</span><span class="p">(</span><span class="n">repository</span><span class="o">=</span><span class="n">image_name</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
 
@@ -966,7 +1042,7 @@ built image.</p></td>
             <span class="k">finally</span><span class="p">:</span>
                 <span class="n">client</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">remove_image</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">image_name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">noprune</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;image_name&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">image_name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;image_name&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">image_name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;image_tag&quot;</span><span class="p">:</span> <span class="n">tag</span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
