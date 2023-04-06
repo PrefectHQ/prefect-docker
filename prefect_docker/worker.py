@@ -32,7 +32,7 @@ import prefect
 from docker import DockerClient
 from docker.models.containers import Container
 from packaging import version
-from prefect.client.orchestration import get_client, ServerType
+from prefect.client.orchestration import ServerType, get_client
 from prefect.client.schemas import FlowRun
 from prefect.docker import (
     format_outlier_version_name,
@@ -373,11 +373,12 @@ class DockerWorker(BaseWorker):
     type = "docker"
     job_configuration = DockerWorkerJobConfiguration
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    async def setup(self):
         self._client = get_client()
         if self._client.server_type == ServerType.EPHEMERAL:
             raise RuntimeError("Docker worker cannot be used with an ephemeral server.")
+
+        return await super().setup()
 
     async def run(
         self,
