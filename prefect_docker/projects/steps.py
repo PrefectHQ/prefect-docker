@@ -1,5 +1,5 @@
 """
-Core set of steps for specifying a Prefect project build step.
+Prefect project steps for building and pushing Docker images.
 """
 import os
 import sys
