@@ -17,16 +17,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- correct type hints for tasks - [#31](https://github.com/PrefectHQ/prefect-docker/issues/31)
-
 ### Security
 
+## 0.2.1
+
+Released April 6th, 2023.
+
+### Added
+
+- Error out on worker start if using ephemeral API - [#45](https://github.com/PrefectHQ/prefect-docker/pull/35)
+
 ## 0.2.0
+
+Released April 6th, 2023.
 
 ### Added
 
 - Beta `DockerWorker` for executing flow runs within Docker containers - [#35](https://github.com/PrefectHQ/prefect-docker/pull/35)
 - Beta 'docker_build_image' project step for building Docker images prior to creating a deployment - [#38](https://github.com/PrefectHQ/prefect-docker/pull/38)
+
+### Fixed
+
+- correct type hints for tasks - [#31](https://github.com/PrefectHQ/prefect-docker/issues/31)
 
 ## 0.1.0
 
