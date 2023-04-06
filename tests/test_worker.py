@@ -35,6 +35,11 @@ def enable_workers():
         yield
 
 
+@pytest.fixture(autouse=True)
+def bypass_api_check(monkeypatch):
+    monkeypatch.setenv("PREFECT_DOCKER_TEST_MODE", True)
+
+
 @pytest.fixture
 def mock_docker_client(monkeypatch):
     mock = MagicMock(name="DockerClient", spec=docker.DockerClient)
@@ -1004,3 +1009,9 @@ async def test_stream_container_logs_on_real_container(
 
     captured = capsys.readouterr()
     assert "hello" in captured.out
+
+
+async def test_worker_errors_out_on_ephemeral_apis():
+    with pytest.raises(RuntimeError, match="ephemeral"):
+        async with DockerWorker(work_pool_name="test", test_mode=False) as worker:
+            await worker.run()

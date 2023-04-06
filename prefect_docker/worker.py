@@ -18,11 +18,12 @@ For more information about work pools and workers,
 checkout out the [Prefect docs](https://docs.prefect.io/concepts/work-pools/).
 """
 import enum
+import os
 import re
 import sys
 import urllib.parse
 import warnings
-from typing import Dict, Generator, List, Optional, Tuple
+from typing import Any, Dict, Generator, List, Optional, Tuple
 
 import anyio.abc
 import docker
@@ -373,10 +374,20 @@ class DockerWorker(BaseWorker):
     type = "docker"
     job_configuration = DockerWorkerJobConfiguration
 
+    def __init__(self, *args: Any, test_mode: bool = None, **kwargs: Any) -> None:
+        if test_mode is None:
+            self.test_mode = bool(os.getenv("PREFECT_DOCKER_TEST_MODE", False))
+        else:
+            self.test_mode = test_mode
+        super().__init__(*args, **kwargs)
+
     async def setup(self):
-        self._client = get_client()
-        if self._client.server_type == ServerType.EPHEMERAL:
-            raise RuntimeError("Docker worker cannot be used with an ephemeral server.")
+        if not self.test_mode:
+            self._client = get_client()
+            if self._client.server_type == ServerType.EPHEMERAL:
+                raise RuntimeError(
+                    "Docker worker cannot be used with an ephemeral server."
+                )
 
         return await super().setup()
 
