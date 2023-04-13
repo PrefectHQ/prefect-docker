@@ -92,7 +92,7 @@ def build_docker_image(
                 image_name: repo-name/image-name
                 tag: dev
                 dockerfile: auto
-                credentials: "{{ prefect.block.docker-registry-credentials.dev-registry }}"
+                credentials: "{{ prefect.blocks.docker-registry-credentials.dev-registry }}"
         ```
     """  # noqa
     auto_build = dockerfile == "auto"
