@@ -32,7 +32,6 @@ import packaging.version
 import prefect
 from docker import DockerClient
 from docker.models.containers import Container
-from packaging import version
 from prefect.client.orchestration import ServerType, get_client
 from prefect.client.schemas import FlowRun
 from prefect.docker import (
@@ -40,24 +39,15 @@ from prefect.docker import (
     get_prefect_image_name,
     parse_image_tag,
 )
+from prefect.exceptions import InfrastructureNotAvailable, InfrastructureNotFound
 from prefect.server.schemas.core import Flow
 from prefect.server.schemas.responses import DeploymentResponse
 from prefect.settings import PREFECT_API_URL
 from prefect.utilities.asyncutils import run_sync_in_worker_thread
+from prefect.workers.base import BaseJobConfiguration, BaseWorker, BaseWorkerResult
 from pydantic import Field, validator
 from slugify import slugify
 from typing_extensions import Literal
-
-# TODO: Remove this after next prefect release
-if version.parse(prefect.__version__) <= version.parse("2.9.0"):
-    from prefect.experimental.workers.base import (
-        BaseJobConfiguration,
-        BaseWorker,
-        BaseWorkerResult,
-    )
-else:
-    from prefect.workers.base import BaseJobConfiguration, BaseWorker, BaseWorkerResult
-
 
 CONTAINER_LABELS = {
     "io.prefect.version": prefect.__version__,
@@ -422,6 +412,58 @@ class DockerWorker(BaseWorker):
             status_code=exit_code if exit_code is not None else -1,
             identifier=container_pid,
         )
+
+    async def kill_infrastructure(
+        self,
+        infrastructure_pid: str,
+        configuration: DockerWorkerJobConfiguration,
+        grace_seconds: int = 30,
+    ):
+        """
+        Stops a container for a cancelled flow run based on the provided infrastructure
+        PID.
+        """
+        docker_client = self._get_client()
+
+        base_url, container_id = self._parse_infrastructure_pid(infrastructure_pid)
+        if docker_client.api.base_url != base_url:
+            raise InfrastructureNotAvailable(
+                "".join(
+                    [
+                        (
+                            f"Unable to stop container {container_id!r}: the current"
+                            " Docker API "
+                        ),
+                        (
+                            f"URL {docker_client.api.base_url!r} does not match the"
+                            " expected "
+                        ),
+                        f"API base URL {base_url}.",
+                    ]
+                )
+            )
+        await run_sync_in_worker_thread(
+            self._stop_container, container_id, docker_client, grace_seconds
+        )
+
+    def _stop_container(
+        self,
+        container_id: str,
+        client: "DockerClient",
+        grace_seconds: int = 30,
+    ):
+        try:
+            container = client.containers.get(container_id=container_id)
+        except docker.errors.NotFound:
+            raise InfrastructureNotFound(
+                f"Unable to stop container {container_id!r}: The container was not"
+                " found."
+            )
+
+        try:
+            container.stop(timeout=grace_seconds)
+        except Exception:
+            raise
 
     def _get_client(self):
         """Returns a docker client."""
