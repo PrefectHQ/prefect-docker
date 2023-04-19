@@ -1,14 +1,17 @@
+import re
 import uuid
 from unittest.mock import MagicMock
 
 import anyio.abc
 import docker
+import docker.errors
 import docker.models.containers
 import pytest
 from docker import DockerClient
 from docker.models.containers import Container
 from prefect.client.schemas import FlowRun
 from prefect.docker import get_prefect_image_name
+from prefect.exceptions import InfrastructureNotAvailable, InfrastructureNotFound
 from prefect.settings import (
     PREFECT_EXPERIMENTAL_ENABLE_WORKERS,
     PREFECT_EXPERIMENTAL_WARN_WORKERS,
@@ -1015,3 +1018,72 @@ async def test_worker_errors_out_on_ephemeral_apis():
     with pytest.raises(RuntimeError, match="ephemeral"):
         async with DockerWorker(work_pool_name="test", test_mode=False) as worker:
             await worker.run()
+
+
+async def test_kill_infrastructure_calls_container_stop(
+    mock_docker_client, default_docker_worker_job_configuration
+):
+    async with DockerWorker(work_pool_name="test") as worker:
+        await worker.kill_infrastructure(
+            infrastructure_pid=f"{FAKE_BASE_URL}:{FAKE_CONTAINER_ID}",
+            configuration=default_docker_worker_job_configuration,
+            grace_seconds=0,
+        )
+    mock_docker_client.containers.get.return_value.stop.assert_called_once()
+
+
+async def test_kill_infrastructure_calls_container_stop_with_correct_grace_seconds(
+    mock_docker_client, default_docker_worker_job_configuration
+):
+    GRACE_SECONDS = 42
+    async with DockerWorker(work_pool_name="test") as worker:
+        await worker.kill_infrastructure(
+            infrastructure_pid=f"{FAKE_BASE_URL}:{FAKE_CONTAINER_ID}",
+            configuration=default_docker_worker_job_configuration,
+            grace_seconds=GRACE_SECONDS,
+        )
+
+    mock_docker_client.containers.get.return_value.stop.assert_called_with(
+        timeout=GRACE_SECONDS
+    )
+
+
+async def test_kill_infrastructure_raises_infra_not_available_with_bad_host_url(
+    mock_docker_client, default_docker_worker_job_configuration
+):
+    BAD_BASE_URL = "bad-base-url"
+    expected_string = "".join(
+        [
+            f"Unable to stop container {FAKE_CONTAINER_ID!r}: the current Docker API ",
+            f"URL {mock_docker_client.api.base_url!r} does not match the expected ",
+            f"API base URL {BAD_BASE_URL}.",
+        ]
+    )
+    with pytest.raises(InfrastructureNotAvailable, match=re.escape(expected_string)):
+        async with DockerWorker(work_pool_name="test") as worker:
+            await worker.kill_infrastructure(
+                infrastructure_pid=f"{BAD_BASE_URL}:{FAKE_CONTAINER_ID}",
+                configuration=default_docker_worker_job_configuration,
+                grace_seconds=0,
+            )
+
+
+async def test_kill_infrastructure_raises_infra_not_found_with_bad_container_id(
+    mock_docker_client, default_docker_worker_job_configuration
+):
+    mock_docker_client.containers.get.side_effect = [docker.errors.NotFound("msg")]
+
+    BAD_CONTAINER_ID = "bad-container-id"
+    with pytest.raises(
+        InfrastructureNotFound,
+        match=(
+            f"Unable to stop container {BAD_CONTAINER_ID!r}: The container was not"
+            " found."
+        ),
+    ):
+        async with DockerWorker(work_pool_name="test") as worker:
+            await worker.kill_infrastructure(
+                infrastructure_pid=f"{FAKE_BASE_URL}:{BAD_CONTAINER_ID}",
+                configuration=default_docker_worker_job_configuration,
+                grace_seconds=0,
+            )
