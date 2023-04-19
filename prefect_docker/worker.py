@@ -460,10 +460,7 @@ class DockerWorker(BaseWorker):
                 " found."
             )
 
-        try:
-            container.stop(timeout=grace_seconds)
-        except Exception:
-            raise
+        container.stop(timeout=grace_seconds)
 
     def _get_client(self):
         """Returns a docker client."""
