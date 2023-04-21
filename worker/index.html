@@ -408,6 +408,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#prefect_docker.worker.DockerWorker.kill_infrastructure" class="md-nav__link">
+    kill_infrastructure()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#prefect_docker.worker.DockerWorker.run" class="md-nav__link">
     run()
   </a>
@@ -547,6 +554,13 @@
   
     <nav class="md-nav" aria-label="Functions">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefect_docker.worker.DockerWorker.kill_infrastructure" class="md-nav__link">
+    kill_infrastructure()
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#prefect_docker.worker.DockerWorker.run" class="md-nav__link">
@@ -704,7 +718,17 @@ checkout out the <a href="https://docs.prefect.io/concepts/work-pools/">Prefect 
 
         <details class="quote">
           <summary>Source code in <code>prefect_docker/worker.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">371</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
 <span class="normal">372</span>
 <span class="normal">373</span>
 <span class="normal">374</span>
@@ -986,7 +1010,46 @@ checkout out the <a href="https://docs.prefect.io/concepts/work-pools/">Prefect 
 <span class="normal">650</span>
 <span class="normal">651</span>
 <span class="normal">652</span>
-<span class="normal">653</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DockerWorker</span><span class="p">(</span><span class="n">BaseWorker</span><span class="p">):</span>
+<span class="normal">653</span>
+<span class="normal">654</span>
+<span class="normal">655</span>
+<span class="normal">656</span>
+<span class="normal">657</span>
+<span class="normal">658</span>
+<span class="normal">659</span>
+<span class="normal">660</span>
+<span class="normal">661</span>
+<span class="normal">662</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span>
+<span class="normal">687</span>
+<span class="normal">688</span>
+<span class="normal">689</span>
+<span class="normal">690</span>
+<span class="normal">691</span>
+<span class="normal">692</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DockerWorker</span><span class="p">(</span><span class="n">BaseWorker</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prefect worker that executes flow runs within Docker containers.&quot;&quot;&quot;</span>
 
     <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;docker&quot;</span>
@@ -1040,6 +1103,55 @@ checkout out the <a href="https://docs.prefect.io/concepts/work-pools/">Prefect 
             <span class="n">status_code</span><span class="o">=</span><span class="n">exit_code</span> <span class="k">if</span> <span class="n">exit_code</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">identifier</span><span class="o">=</span><span class="n">container_pid</span><span class="p">,</span>
         <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">kill_infrastructure</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">infrastructure_pid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">:</span> <span class="n">DockerWorkerJobConfiguration</span><span class="p">,</span>
+        <span class="n">grace_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stops a container for a cancelled flow run based on the provided infrastructure</span>
+<span class="sd">        PID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">docker_client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client</span><span class="p">()</span>
+
+        <span class="n">base_url</span><span class="p">,</span> <span class="n">container_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_infrastructure_pid</span><span class="p">(</span><span class="n">infrastructure_pid</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">docker_client</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">!=</span> <span class="n">base_url</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InfrastructureNotAvailable</span><span class="p">(</span>
+                <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Unable to stop container </span><span class="si">{</span><span class="n">container_id</span><span class="si">!r}</span><span class="s2">: the current&quot;</span>
+                            <span class="s2">&quot; Docker API &quot;</span>
+                        <span class="p">),</span>
+                        <span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;URL </span><span class="si">{</span><span class="n">docker_client</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span><span class="si">!r}</span><span class="s2"> does not match the&quot;</span>
+                            <span class="s2">&quot; expected &quot;</span>
+                        <span class="p">),</span>
+                        <span class="sa">f</span><span class="s2">&quot;API base URL </span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">await</span> <span class="n">run_sync_in_worker_thread</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stop_container</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">docker_client</span><span class="p">,</span> <span class="n">grace_seconds</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_stop_container</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">container_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">client</span><span class="p">:</span> <span class="s2">&quot;DockerClient&quot;</span><span class="p">,</span>
+        <span class="n">grace_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">container</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">container_id</span><span class="o">=</span><span class="n">container_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">docker</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">NotFound</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InfrastructureNotFound</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unable to stop container </span><span class="si">{</span><span class="n">container_id</span><span class="si">!r}</span><span class="s2">: The container was not&quot;</span>
+                <span class="s2">&quot; found.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">container</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">grace_seconds</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a docker client.&quot;&quot;&quot;</span>
@@ -1288,6 +1400,96 @@ checkout out the <a href="https://docs.prefect.io/concepts/work-pools/">Prefect 
 
 
 
+<h5 id="prefect_docker.worker.DockerWorker.kill_infrastructure" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">kill_infrastructure</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Stops a container for a cancelled flow run based on the provided infrastructure
+PID.</p>
+
+      <details class="quote">
+        <summary>Source code in <code>prefect_docker/worker.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">kill_infrastructure</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">infrastructure_pid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">configuration</span><span class="p">:</span> <span class="n">DockerWorkerJobConfiguration</span><span class="p">,</span>
+    <span class="n">grace_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stops a container for a cancelled flow run based on the provided infrastructure</span>
+<span class="sd">    PID.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">docker_client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client</span><span class="p">()</span>
+
+    <span class="n">base_url</span><span class="p">,</span> <span class="n">container_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_infrastructure_pid</span><span class="p">(</span><span class="n">infrastructure_pid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">docker_client</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span> <span class="o">!=</span> <span class="n">base_url</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">InfrastructureNotAvailable</span><span class="p">(</span>
+            <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Unable to stop container </span><span class="si">{</span><span class="n">container_id</span><span class="si">!r}</span><span class="s2">: the current&quot;</span>
+                        <span class="s2">&quot; Docker API &quot;</span>
+                    <span class="p">),</span>
+                    <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;URL </span><span class="si">{</span><span class="n">docker_client</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">base_url</span><span class="si">!r}</span><span class="s2"> does not match the&quot;</span>
+                        <span class="s2">&quot; expected &quot;</span>
+                    <span class="p">),</span>
+                    <span class="sa">f</span><span class="s2">&quot;API base URL </span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">await</span> <span class="n">run_sync_in_worker_thread</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stop_container</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">docker_client</span><span class="p">,</span> <span class="n">grace_seconds</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
 <h5 id="prefect_docker.worker.DockerWorker.run" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">run</span></code>
   
@@ -1305,7 +1507,17 @@ to complete.</p>
 
       <details class="quote">
         <summary>Source code in <code>prefect_docker/worker.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">394</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
 <span class="normal">395</span>
 <span class="normal">396</span>
 <span class="normal">397</span>
@@ -1325,17 +1537,7 @@ to complete.</p>
 <span class="normal">411</span>
 <span class="normal">412</span>
 <span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span>
-<span class="normal">424</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+<span class="normal">414</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">flow_run</span><span class="p">:</span> <span class="s2">&quot;FlowRun&quot;</span><span class="p">,</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="n">BaseJobConfiguration</span><span class="p">,</span>
@@ -1521,7 +1723,17 @@ allowing the container to use as much swap as memory. For example, if
 
         <details class="quote">
           <summary>Source code in <code>prefect_docker/worker.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 75</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
 <span class="normal"> 76</span>
 <span class="normal"> 77</span>
 <span class="normal"> 78</span>
@@ -1800,17 +2012,7 @@ allowing the container to use as much swap as memory. For example, if
 <span class="normal">351</span>
 <span class="normal">352</span>
 <span class="normal">353</span>
-<span class="normal">354</span>
-<span class="normal">355</span>
-<span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span>
-<span class="normal">359</span>
-<span class="normal">360</span>
-<span class="normal">361</span>
-<span class="normal">362</span>
-<span class="normal">363</span>
-<span class="normal">364</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DockerWorkerJobConfiguration</span><span class="p">(</span><span class="n">BaseJobConfiguration</span><span class="p">):</span>
+<span class="normal">354</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DockerWorkerJobConfiguration</span><span class="p">(</span><span class="n">BaseJobConfiguration</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Configuration class used by the Docker worker.</span>
 
@@ -2133,7 +2335,17 @@ already have this mapping.</p>
 
       <details class="quote">
         <summary>Source code in <code>prefect_docker/worker.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">307</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
 <span class="normal">308</span>
 <span class="normal">309</span>
 <span class="normal">310</span>
@@ -2155,17 +2367,7 @@ already have this mapping.</p>
 <span class="normal">326</span>
 <span class="normal">327</span>
 <span class="normal">328</span>
-<span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span>
-<span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span>
-<span class="normal">337</span>
-<span class="normal">338</span>
-<span class="normal">339</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_extra_hosts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docker_client</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="normal">329</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_extra_hosts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">docker_client</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A host.docker.internal -&gt; host-gateway mapping is necessary for communicating</span>
 <span class="sd">    with the API on Linux machines. Docker Desktop on macOS will automatically</span>
@@ -2221,7 +2423,17 @@ options and the platform.</p>
 
       <details class="quote">
         <summary>Source code in <code>prefect_docker/worker.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">265</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
 <span class="normal">266</span>
 <span class="normal">267</span>
 <span class="normal">268</span>
@@ -2251,17 +2463,7 @@ options and the platform.</p>
 <span class="normal">292</span>
 <span class="normal">293</span>
 <span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_network_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">295</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_network_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the network mode to use for the container based on the configured</span>
 <span class="sd">    options and the platform.</span>
@@ -2325,23 +2527,23 @@ attributes.</p>
 
       <details class="quote">
         <summary>Source code in <code>prefect_docker/worker.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">247</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
 <span class="normal">248</span>
 <span class="normal">249</span>
 <span class="normal">250</span>
 <span class="normal">251</span>
 <span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">prepare_for_flow_run</span><span class="p">(</span>
+<span class="normal">253</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">prepare_for_flow_run</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">flow_run</span><span class="p">:</span> <span class="s2">&quot;FlowRun&quot;</span><span class="p">,</span>
     <span class="n">deployment</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;DeploymentResponse&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2393,8 +2595,8 @@ attributes.</p>
 
         <details class="quote">
           <summary>Source code in <code>prefect_docker/worker.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">367</span>
-<span class="normal">368</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DockerWorkerResult</span><span class="p">(</span><span class="n">BaseWorkerResult</span><span class="p">):</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">357</span>
+<span class="normal">358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DockerWorkerResult</span><span class="p">(</span><span class="n">BaseWorkerResult</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Contains information about a completed Docker container&quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
         </details>
@@ -2424,12 +2626,12 @@ attributes.</p>
 
         <details class="quote">
           <summary>Source code in <code>prefect_docker/worker.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">ImagePullPolicy</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">ImagePullPolicy</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum representing the image pull policy options for a Docker container.&quot;&quot;&quot;</span>
 
     <span class="n">IF_NOT_PRESENT</span> <span class="o">=</span> <span class="s2">&quot;IfNotPresent&quot;</span>
