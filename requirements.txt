@@ -1,2 +1,2 @@
-prefect>=2.9.0
+prefect>=2.10.5
 docker>=6.0.0

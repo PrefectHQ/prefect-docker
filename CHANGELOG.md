@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `kill_infrastructure` method on `DockerWorker` which stops containers for cancelled flow runs  - [#48](https://github.com/PrefectHQ/prefect-docker/pull/48)
-
 ### Changed
 
 ### Deprecated
@@ -20,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## 0.2.2
+
+Released April 20th, 2023.
+
+### Added
+
+- `kill_infrastructure` method on `DockerWorker` which stops containers for cancelled flow runs  - [#48](https://github.com/PrefectHQ/prefect-docker/pull/48)
 
 ## 0.2.1
 
