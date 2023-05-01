@@ -39,6 +39,8 @@ from prefect.docker import (
     get_prefect_image_name,
     parse_image_tag,
 )
+from prefect.events import Event, RelatedResource, emit_event
+from prefect.events.related import object_as_related_resource, tags_as_related_resources
 from prefect.exceptions import InfrastructureNotAvailable, InfrastructureNotFound
 from prefect.server.schemas.core import Flow
 from prefect.server.schemas.responses import DeploymentResponse
@@ -353,6 +355,22 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
             return ImagePullPolicy.IF_NOT_PRESENT
         return ImagePullPolicy(self.image_pull_policy)
 
+    def _related_resources(self) -> List[RelatedResource]:
+        """Returns a list of related resources for the container."""
+        tags = set()
+        related = []
+
+        for kind, obj in self._related_objects.items():
+            # TODO: Remove this method once we've updated the Prefect core side
+            # to ignore objects that are None.
+            if not obj:
+                continue
+            if hasattr(obj, "tags"):
+                tags.update(obj.tags)
+            related.append(object_as_related_resource(kind=kind, role=kind, object=obj))
+
+        return related + tags_as_related_resources(tags)
+
 
 class DockerWorkerResult(BaseWorkerResult):
     """Contains information about a completed Docker container"""
@@ -393,7 +411,7 @@ class DockerWorker(BaseWorker):
         """
         # The `docker` library uses requests instead of an async http library so it must
         # be run in a thread to avoid blocking the event loop.
-        container = await run_sync_in_worker_thread(
+        container, created_event = await run_sync_in_worker_thread(
             self._create_and_start_container, configuration
         )
         container_pid = self._get_infrastructure_pid(container_id=container.id)
@@ -404,7 +422,7 @@ class DockerWorker(BaseWorker):
 
         # Monitor the container
         container = await run_sync_in_worker_thread(
-            self._watch_container_safe, container, configuration
+            self._watch_container_safe, container, configuration, created_event
         )
 
         exit_code = container.attrs["State"].get("ExitCode")
@@ -522,7 +540,7 @@ class DockerWorker(BaseWorker):
 
     def _create_and_start_container(
         self, configuration: DockerWorkerJobConfiguration
-    ) -> "Container":
+    ) -> Tuple["Container", Event]:
         """Creates and starts a Docker container."""
         docker_client = self._get_client()
         container_settings = self._build_container_settings(
@@ -534,6 +552,10 @@ class DockerWorker(BaseWorker):
             self._pull_image(docker_client, configuration)
 
         container = self._create_container(docker_client, **container_settings)
+
+        created_event = self._emit_container_status_change_event(
+            container, configuration
+        )
 
         # Add additional networks after the container is created; only one network can
         # be attached at creation time
@@ -547,10 +569,13 @@ class DockerWorker(BaseWorker):
 
         docker_client.close()
 
-        return container
+        return container, created_event
 
     def _watch_container_safe(
-        self, container: "Container", configuration: DockerWorkerJobConfiguration
+        self,
+        container: "Container",
+        configuration: DockerWorkerJobConfiguration,
+        created_event: Event,
     ) -> "Container":
         """Watches a container for completion, handling any errors that may occur."""
         # Monitor the container capturing the latest snapshot while capturing
@@ -558,10 +583,18 @@ class DockerWorker(BaseWorker):
         docker_client = self._get_client()
 
         try:
+            seen_statuses = {container.status}
+            last_event = created_event
             for latest_container in self._watch_container(
                 docker_client, container.id, configuration
             ):
                 container = latest_container
+                if container.status not in seen_statuses:
+                    seen_statuses.add(container.status)
+                    last_event = self._emit_container_status_change_event(
+                        container, configuration, last_event=last_event
+                    )
+
         except docker.errors.NotFound:
             # The container was removed during watching
             self._logger.warning(
@@ -690,3 +723,32 @@ class DockerWorker(BaseWorker):
             f"Docker container {container.name!r} has status {container.status!r}"
         )
         return container
+
+    def _container_as_resource(self, container: "Container") -> Dict[str, str]:
+        """Convert a container to a resource dictionary"""
+        return {
+            "prefect.resource.id": f"prefect.docker.container.{container.id}",
+            "prefect.resource.name": container.name,
+        }
+
+    def _emit_container_status_change_event(
+        self,
+        container: "Container",
+        configuration: DockerWorkerJobConfiguration,
+        last_event: Optional[Event] = None,
+    ) -> Event:
+        """Emit a Prefect event for a Docker container event."""
+        resource = self._container_as_resource(container)
+
+        related = self._event_related_resources(configuration=configuration)
+
+        worker_resource = self._event_resource()
+        worker_resource["prefect.resource.role"] = "worker"
+        worker_related_resource = RelatedResource(__root__=worker_resource)
+
+        return emit_event(
+            event=f"prefect.docker.container.{container.status.lower()}",
+            resource=resource,
+            related=related + [worker_related_resource],
+            follows=last_event,
+        )

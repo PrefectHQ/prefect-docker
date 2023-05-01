@@ -1,6 +1,7 @@
+import copy
 import re
 import uuid
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call, patch
 
 import anyio.abc
 import docker
@@ -11,6 +12,7 @@ from docker import DockerClient
 from docker.models.containers import Container
 from prefect.client.schemas import FlowRun
 from prefect.docker import get_prefect_image_name
+from prefect.events import RelatedResource
 from prefect.exceptions import InfrastructureNotAvailable, InfrastructureNotFound
 from prefect.settings import (
     PREFECT_EXPERIMENTAL_ENABLE_WORKERS,
@@ -49,6 +51,7 @@ def mock_docker_client(monkeypatch):
     mock.version.return_value = {"Version": "20.10"}
 
     # Build a fake container object to return
+
     fake_container = docker.models.containers.Container()
     fake_container.client = MagicMock(name="Container.client")
     fake_container.collection = MagicMock(name="Container.collection")
@@ -56,7 +59,7 @@ def mock_docker_client(monkeypatch):
         "Id": FAKE_CONTAINER_ID,
         "Name": "fake-name",
         "State": {
-            "Status": "exited",
+            "Status": "running",
             "Running": False,
             "Paused": False,
             "Restarting": False,
@@ -72,9 +75,19 @@ def mock_docker_client(monkeypatch):
     fake_container.collection.get().attrs = attrs
     fake_container.attrs = attrs
     fake_container.stop = MagicMock()
+
+    def fake_reload():
+        nonlocal fake_container
+        fake_container.attrs["State"]["Status"] = "exited"
+
+    fake_container.reload = MagicMock(side_effect=fake_reload)
+
+    created_container = copy.deepcopy(fake_container)
+    created_container.attrs["State"]["Status"] = "created"
+
     # Return the fake container on lookups and creation
     mock.containers.get.return_value = fake_container
-    mock.containers.create.return_value = fake_container
+    mock.containers.create.return_value = created_container
 
     # Set attributes for infrastructure PID lookup
     fake_api = MagicMock(name="APIClient")
@@ -162,7 +175,9 @@ async def test_container_name_includes_index_on_conflict(
             raise docker.errors.APIError(
                 "Conflict. The container name 'foobar' is already in use"
             )
-        return MagicMock()  # A container
+        container = MagicMock()
+        container.name = kwargs.get("name")
+        return container
 
     mock_docker_client.containers.create.side_effect = fail_if_name_exists
 
@@ -1087,3 +1102,57 @@ async def test_kill_infrastructure_raises_infra_not_found_with_bad_container_id(
                 configuration=default_docker_worker_job_configuration,
                 grace_seconds=0,
             )
+
+
+async def test_emits_events(
+    mock_docker_client, flow_run, default_docker_worker_job_configuration
+):
+
+    event_count = 0
+
+    def event(*args, **kwargs):
+        nonlocal event_count
+        event_count += 1
+        return event_count
+
+    with patch("prefect_docker.worker.emit_event", side_effect=event) as mock_emit:
+        async with DockerWorker(work_pool_name="test") as worker:
+            await worker.run(
+                flow_run=flow_run, configuration=default_docker_worker_job_configuration
+            )
+
+    worker_resource = worker._event_resource()
+    worker_resource["prefect.resource.role"] = "worker"
+    worker_related_resource = RelatedResource(__root__=worker_resource)
+
+    mock_emit.assert_has_calls(
+        [
+            call(
+                event="prefect.docker.container.created",
+                resource={
+                    "prefect.resource.id": "prefect.docker.container.fake-id",
+                    "prefect.resource.name": "fake-name",
+                },
+                related=[worker_related_resource],
+                follows=None,
+            ),
+            call(
+                event="prefect.docker.container.running",
+                resource={
+                    "prefect.resource.id": "prefect.docker.container.fake-id",
+                    "prefect.resource.name": "fake-name",
+                },
+                related=[worker_related_resource],
+                follows=1,
+            ),
+            call(
+                event="prefect.docker.container.exited",
+                resource={
+                    "prefect.resource.id": "prefect.docker.container.fake-id",
+                    "prefect.resource.name": "fake-name",
+                },
+                related=[worker_related_resource],
+                follows=2,
+            ),
+        ]
+    )
