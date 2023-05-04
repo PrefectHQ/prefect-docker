@@ -1,8 +1,8 @@
 from pathlib import Path
-from unittest import mock
 from unittest.mock import MagicMock
 
 import docker
+import docker.errors
 import docker.models.containers
 import docker.models.images
 import pendulum
@@ -52,6 +52,9 @@ def mock_docker_client(monkeypatch):
 
     # Set attributes for infrastructure PID lookup
     fake_api = MagicMock(name="APIClient")
+    fake_api.build.return_value = [
+        {"aux": {"ID": FAKE_CONTAINER_ID}},
+    ]
     fake_api.base_url = FAKE_BASE_URL
     mock_client.api = fake_api
 
@@ -66,14 +69,6 @@ def mock_docker_client(monkeypatch):
 
 
 @pytest.fixture
-def mock_build_image(monkeypatch):
-    mock_build_image = MagicMock(name="build_image", spec=prefect.docker.build_image)
-    mock_build_image.return_value = FAKE_CONTAINER_ID
-    monkeypatch.setattr("prefect_docker.projects.steps.build_image", mock_build_image)
-    return mock_build_image
-
-
-@pytest.fixture
 def mock_pendulum(monkeypatch):
     mock_pendulum = MagicMock(name="pendulum", spec=pendulum)
     mock_pendulum.now.return_value = pendulum.datetime(2022, 8, 31, 18, 1, 32)
@@ -82,19 +77,25 @@ def mock_pendulum(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    "kwargs, expected_image_name",
+    "kwargs, expected_image",
     [
         ({"image_name": "registry/repo"}, f"registry/repo:{FAKE_DEFAULT_TAG}"),
         (
-            {"image_name": "registry/repo", "dockerfile": "Dockerfile.dev"},
+            {
+                "image_name": "registry/repo",
+                "dockerfile": "Dockerfile.dev",
+                "push": True,
+            },
             f"registry/repo:{FAKE_DEFAULT_TAG}",
         ),
         (
-            {"image_name": "registry/repo", "tag": "mytag"},
+            {"image_name": "registry/repo", "tag": "mytag", "push": True},
             "registry/repo:mytag",
         ),
         (
-            {"image_name": "registry/repo", "push": False},
+            {
+                "image_name": "registry/repo",
+            },
             f"registry/repo:{FAKE_DEFAULT_TAG}",
         ),
         (
@@ -105,6 +106,7 @@ def mock_pendulum(monkeypatch):
             {
                 "image_name": "registry/repo",
                 "dockerfile": "auto",
+                "push": True,
                 "credentials": {
                     "username": "user",
                     "password": "pass",
@@ -119,32 +121,27 @@ def mock_pendulum(monkeypatch):
 def test_build_docker_image(
     monkeypatch,
     mock_docker_client,
-    mock_build_image,
     mock_pendulum,
     kwargs,
-    expected_image_name,
+    expected_image,
 ):
     auto_build = False
     image_name = kwargs.get("image_name")
     dockerfile = kwargs.get("dockerfile", "Dockerfile")
     tag = kwargs.get("tag", FAKE_DEFAULT_TAG)
-    push = kwargs.get("push", True)
+    push = kwargs.get("push", False)
     credentials = kwargs.get("credentials", None)
     result = build_docker_image(**kwargs)
 
-    assert result["image_name"] == expected_image_name
+    assert result["image"] == expected_image
     assert result["image_tag"] == tag
+    assert result["image_name"] == image_name
+    assert result["image_id"] == FAKE_CONTAINER_ID
 
     if dockerfile == "auto":
         auto_build = True
         dockerfile = "Dockerfile"
 
-    mock_build_image.assert_called_once_with(
-        context=Path("."),
-        dockerfile=dockerfile,
-        pull=True,
-        stream_progress_to=mock.ANY,
-    )
     mock_docker_client.images.get.assert_called_once_with(FAKE_CONTAINER_ID)
     mock_docker_client.images.get.return_value.tag.assert_called_once_with(
         repository=image_name, tag=tag
@@ -157,7 +154,7 @@ def test_build_docker_image(
             decode=True,
         )
         mock_docker_client.api.remove_image.assert_called_once_with(
-            image=expected_image_name, noprune=True
+            image=expected_image, noprune=True
         )
     else:
         mock_docker_client.api.push.assert_not_called()
@@ -192,7 +189,7 @@ def test_real_auto_dockerfile_build(docker_client_with_cleanup):
             image_name="local/repo", tag="test", dockerfile="auto", push=False
         )
         image: docker.models.images.Image = docker_client_with_cleanup.images.get(
-            result["image_name"]
+            result["image"]
         )
         assert image
 
@@ -207,7 +204,7 @@ def test_real_auto_dockerfile_build(docker_client_with_cleanup):
 
         for case in cases:
             output = docker_client_with_cleanup.containers.run(
-                image=result["image_name"],
+                image=result["image"],
                 command=case["command"],
                 labels=["prefect-docker-test"],
                 remove=True,
