@@ -40,7 +40,6 @@ from prefect.docker import (
     parse_image_tag,
 )
 from prefect.events import Event, RelatedResource, emit_event
-from prefect.events.related import object_as_related_resource, tags_as_related_resources
 from prefect.exceptions import InfrastructureNotAvailable, InfrastructureNotFound
 from prefect.server.schemas.core import Flow
 from prefect.server.schemas.responses import DeploymentResponse
@@ -354,22 +353,6 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
                 return ImagePullPolicy.ALWAYS
             return ImagePullPolicy.IF_NOT_PRESENT
         return ImagePullPolicy(self.image_pull_policy)
-
-    def _related_resources(self) -> List[RelatedResource]:
-        """Returns a list of related resources for the container."""
-        tags = set()
-        related = []
-
-        for kind, obj in self._related_objects.items():
-            # TODO: Remove this method once we've updated the Prefect core side
-            # to ignore objects that are None.
-            if not obj:
-                continue
-            if hasattr(obj, "tags"):
-                tags.update(obj.tags)
-            related.append(object_as_related_resource(kind=kind, role=kind, object=obj))
-
-        return related + tags_as_related_resources(tags)
 
 
 class DockerWorkerResult(BaseWorkerResult):
