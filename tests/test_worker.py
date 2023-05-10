@@ -1156,3 +1156,29 @@ async def test_emits_events(
             ),
         ]
     )
+
+
+async def test_emits_event_container_creation_failure(
+    mock_docker_client, flow_run, default_docker_worker_job_configuration
+):
+    import docker.errors
+
+    mock_docker_client.containers.create.side_effect = docker.errors.APIError(
+        "test error"
+    )
+
+    worker_resource = None
+    with patch("prefect_docker.worker.emit_event") as mock_emit:
+        with pytest.raises(docker.errors.APIError, match="test error"):
+            async with DockerWorker(work_pool_name="test") as worker:
+                worker_resource = worker._event_resource()
+                await worker.run(
+                    flow_run=flow_run,
+                    configuration=default_docker_worker_job_configuration,
+                )
+
+        mock_emit.assert_called_once_with(
+            event="prefect.docker.container.creation-failed",
+            resource=worker_resource,
+            related=[],
+        )
