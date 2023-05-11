@@ -21,15 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.2.3
 
-Released May 8th, 2023.
+Released May ??th, 2023.
 
 ### Added
 
-- Emit Docker container events from `DockerWorker` - [#50](https://github.com/PrefectHQ/prefect-docker/pull/50)
-
-### Changed
-
-- Bumped `docker` version to 6.1.1 to resolve issue with [urllib3 v2 incompatibility](https://github.com/docker/docker-py/issues/3113) - [#52](https://github.com/PrefectHQ/prefect-docker/pull/52)
+- Emit a Prefect event when creation of a docker container fails.
 
 ## 0.2.2
 
