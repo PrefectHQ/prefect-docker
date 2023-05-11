@@ -40,7 +40,6 @@ from prefect.docker import (
     parse_image_tag,
 )
 from prefect.events import Event, RelatedResource, emit_event
-from prefect.events.related import object_as_related_resource, tags_as_related_resources
 from prefect.exceptions import InfrastructureNotAvailable, InfrastructureNotFound
 from prefect.server.schemas.core import Flow
 from prefect.server.schemas.responses import DeploymentResponse
@@ -355,22 +354,6 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
             return ImagePullPolicy.IF_NOT_PRESENT
         return ImagePullPolicy(self.image_pull_policy)
 
-    def _related_resources(self) -> List[RelatedResource]:
-        """Returns a list of related resources for the container."""
-        tags = set()
-        related = []
-
-        for kind, obj in self._related_objects.items():
-            # TODO: Remove this method once we've updated the Prefect core side
-            # to ignore objects that are None.
-            if not obj:
-                continue
-            if hasattr(obj, "tags"):
-                tags.update(obj.tags)
-            related.append(object_as_related_resource(kind=kind, role=kind, object=obj))
-
-        return related + tags_as_related_resources(tags)
-
 
 class DockerWorkerResult(BaseWorkerResult):
     """Contains information about a completed Docker container"""
@@ -551,7 +534,11 @@ class DockerWorker(BaseWorker):
             self._logger.info(f"Pulling image {configuration.image!r}...")
             self._pull_image(docker_client, configuration)
 
-        container = self._create_container(docker_client, **container_settings)
+        try:
+            container = self._create_container(docker_client, **container_settings)
+        except Exception as exc:
+            self._emit_container_creation_failed_event(configuration)
+            raise exc
 
         created_event = self._emit_container_status_change_event(
             container, configuration
@@ -731,6 +718,16 @@ class DockerWorker(BaseWorker):
             "prefect.resource.name": container.name,
         }
 
+    def _emit_container_creation_failed_event(
+        self, configuration: DockerWorkerJobConfiguration
+    ) -> Event:
+        """Emit a Prefect event when a docker container fails to be created."""
+        return emit_event(
+            event="prefect.docker.container.creation-failed",
+            resource=self._event_resource(),
+            related=self._event_related_resources(configuration=configuration),
+        )
+
     def _emit_container_status_change_event(
         self,
         container: "Container",
@@ -738,8 +735,6 @@ class DockerWorker(BaseWorker):
         last_event: Optional[Event] = None,
     ) -> Event:
         """Emit a Prefect event for a Docker container event."""
-        resource = self._container_as_resource(container)
-
         related = self._event_related_resources(configuration=configuration)
 
         worker_resource = self._event_resource()
@@ -748,7 +743,7 @@ class DockerWorker(BaseWorker):
 
         return emit_event(
             event=f"prefect.docker.container.{container.status.lower()}",
-            resource=resource,
+            resource=self._container_as_resource(container),
             related=related + [worker_related_resource],
             follows=last_event,
         )

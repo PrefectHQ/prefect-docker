@@ -19,6 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## 0.2.3
+
+Released May ??th, 2023.
+
+### Added
+
+- Emit a Prefect event when creation of a docker container fails.
+
 ## 0.2.2
 
 Released April 20th, 2023.
