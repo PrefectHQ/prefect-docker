@@ -365,7 +365,7 @@ class DockerWorker(BaseWorker):
     type = "docker"
     job_configuration = DockerWorkerJobConfiguration
     _description = (
-        "Execute flow runs within Docker containers. Works well if you manage flow "
+        "Execute flow runs within Docker containers. Works well for managing flow "
         "execution environments via Docker images. Requires access to a running "
         "Docker daemon."
     )
