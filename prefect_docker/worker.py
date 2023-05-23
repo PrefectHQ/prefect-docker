@@ -364,6 +364,15 @@ class DockerWorker(BaseWorker):
 
     type = "docker"
     job_configuration = DockerWorkerJobConfiguration
+    _description = (
+        "Execute flow runs within Docker containers. Works well if you manage flow "
+        "execution environments via Docker images. Requires access to a running "
+        "Docker daemon."
+    )
+    _display_name = "Docker"
+    _documentation_url = "https://prefecthq.github.io/prefect-docker/worker/"
+    _is_beta = True
+    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250"  # noqa
 
     def __init__(self, *args: Any, test_mode: bool = None, **kwargs: Any) -> None:
         if test_mode is None:
