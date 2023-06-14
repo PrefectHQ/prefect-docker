@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Emit a Prefect event when creation of a docker container fails.
+- Emit a Prefect event when creation of a docker container fails - [#50](https://github.com/PrefectHQ/prefect-docker/pull/50)
 - Ability to pass build kwargs into `build_docker_image` - [#51](https://github.com/PrefectHQ/prefect-docker/pull/51)
 - `image_id` and `image` to `build_docker_image` output. image has the same contents as the current `image_name` - [#51](https://github.com/PrefectHQ/prefect-docker/pull/51)
 - `push_docker_image` step - [#64](https://github.com/PrefectHQ/prefect-docker/pull/64)
