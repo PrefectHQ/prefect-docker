@@ -105,7 +105,7 @@ def default_docker_worker_job_configuration():
 
 @pytest.fixture
 def flow_run():
-    return FlowRun()
+    return FlowRun(flow_id=uuid.uuid4())
 
 
 @pytest.mark.parametrize(
