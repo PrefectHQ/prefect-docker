@@ -34,17 +34,17 @@ from docker import DockerClient
 from docker.models.containers import Container
 from prefect.client.orchestration import ServerType, get_client
 from prefect.client.schemas import FlowRun
-from prefect.docker import (
-    format_outlier_version_name,
-    get_prefect_image_name,
-    parse_image_tag,
-)
 from prefect.events import Event, RelatedResource, emit_event
 from prefect.exceptions import InfrastructureNotAvailable, InfrastructureNotFound
 from prefect.server.schemas.core import Flow
 from prefect.server.schemas.responses import DeploymentResponse
 from prefect.settings import PREFECT_API_URL
 from prefect.utilities.asyncutils import run_sync_in_worker_thread
+from prefect.utilities.dockerutils import (
+    format_outlier_version_name,
+    get_prefect_image_name,
+    parse_image_tag,
+)
 from prefect.workers.base import BaseJobConfiguration, BaseWorker, BaseWorkerResult
 from pydantic import Field, validator
 from slugify import slugify

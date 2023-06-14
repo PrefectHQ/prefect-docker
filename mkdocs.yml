@@ -51,8 +51,8 @@ nav:
     - Credentials: credentials.md
     - Containers: containers.md
     - Images: images.md
-    - Projects:
-      - Steps: projects/steps.md
+    - Deployments:
+      - Steps: deployments/steps.md
     - Worker: worker.md
 extra:
     social:
