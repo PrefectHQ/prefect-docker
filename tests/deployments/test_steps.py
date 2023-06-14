@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -10,11 +11,20 @@ import prefect
 import prefect.utilities.dockerutils
 import pytest
 
-from prefect_docker.deployments.steps import build_docker_image
+from prefect_docker.deployments.steps import build_docker_image, push_docker_image
 
 FAKE_CONTAINER_ID = "fake-id"
 FAKE_BASE_URL = "http+docker://my-url"
 FAKE_DEFAULT_TAG = "2022-08-31t18-01-32-00-00"
+FAKE_IMAGE_NAME = "registry/repo"
+FAKE_TAG = "mytag"
+FAKE_EVENT = [{"status": "status", "progress": "progress"}, {"status": "status"}]
+FAKE_CREDENTIALS = {
+    "username": "user",
+    "password": "pass",
+    "registry_url": "https://registry.com",
+    "reauth": True,
+}
 
 
 @pytest.fixture
@@ -134,7 +144,7 @@ def test_build_docker_image(
     result = build_docker_image(**kwargs)
 
     assert result["image"] == expected_image
-    assert result["image_tag"] == tag
+    assert result["tag"] == tag
     assert result["image_name"] == image_name
     assert result["image_id"] == FAKE_CONTAINER_ID
 
@@ -220,3 +230,69 @@ def test_real_auto_dockerfile_build(docker_client_with_cleanup):
             docker_client_with_cleanup.images.remove(
                 image="local/repo:test", force=True
             )
+
+
+def test_push_docker_image_with_credentials(mock_docker_client, monkeypatch):
+    # Mock stdout
+    mock_stdout = MagicMock()
+    monkeypatch.setattr(sys, "stdout", mock_stdout)
+
+    mock_docker_client.api.push.return_value = FAKE_EVENT
+
+    result = push_docker_image(
+        image_name=FAKE_IMAGE_NAME, tag=FAKE_TAG, credentials=FAKE_CREDENTIALS
+    )
+
+    assert result["image_name"] == FAKE_IMAGE_NAME
+    assert result["tag"] == FAKE_TAG
+    assert result["image"] == f"{FAKE_IMAGE_NAME}:{FAKE_TAG}"
+
+    mock_docker_client.login.assert_called_once_with(
+        username=FAKE_CREDENTIALS["username"],
+        password=FAKE_CREDENTIALS["password"],
+        registry=FAKE_CREDENTIALS["registry_url"],
+        reauth=FAKE_CREDENTIALS.get("reauth", True),
+    )
+    mock_docker_client.api.push.assert_called_once_with(
+        repository=FAKE_IMAGE_NAME,
+        tag=FAKE_TAG,
+        stream=True,
+        decode=True,
+    )
+    assert mock_stdout.write.call_count == 5
+
+
+def test_push_docker_image_without_credentials(mock_docker_client, monkeypatch):
+    # Mock stdout
+    mock_stdout = MagicMock()
+    monkeypatch.setattr(sys, "stdout", mock_stdout)
+
+    mock_docker_client.api.push.return_value = FAKE_EVENT
+
+    result = push_docker_image(
+        image_name=FAKE_IMAGE_NAME,
+        tag=FAKE_TAG,
+    )
+
+    assert result["image_name"] == FAKE_IMAGE_NAME
+    assert result["tag"] == FAKE_TAG
+    assert result["image"] == f"{FAKE_IMAGE_NAME}:{FAKE_TAG}"
+
+    mock_docker_client.login.assert_not_called()
+    mock_docker_client.api.push.assert_called_once_with(
+        repository=FAKE_IMAGE_NAME,
+        tag=FAKE_TAG,
+        stream=True,
+        decode=True,
+    )
+    assert mock_stdout.write.call_count == 5
+
+
+def test_push_docker_image_raises_on_event_error(mock_docker_client):
+    error_event = [{"error": "Error"}]
+    mock_docker_client.api.push.return_value = error_event
+
+    with pytest.raises(OSError, match="Error"):
+        push_docker_image(
+            image_name=FAKE_IMAGE_NAME, tag=FAKE_TAG, credentials=FAKE_CREDENTIALS
+        )
