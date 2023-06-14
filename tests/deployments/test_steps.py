@@ -10,7 +10,7 @@ import prefect
 import prefect.docker
 import pytest
 
-from prefect_docker.projects.steps import build_docker_image
+from prefect_docker.deployments.steps import build_docker_image
 
 FAKE_CONTAINER_ID = "fake-id"
 FAKE_BASE_URL = "http+docker://my-url"
@@ -63,7 +63,7 @@ def mock_docker_client(monkeypatch):
     )
     mock_docker_client_func.return_value.__enter__.return_value = mock_client
     monkeypatch.setattr(
-        "prefect_docker.projects.steps.docker_client", mock_docker_client_func
+        "prefect_docker.deployments.steps.docker_client", mock_docker_client_func
     )
     return mock_client
 
@@ -72,7 +72,7 @@ def mock_docker_client(monkeypatch):
 def mock_pendulum(monkeypatch):
     mock_pendulum = MagicMock(name="pendulum", spec=pendulum)
     mock_pendulum.now.return_value = pendulum.datetime(2022, 8, 31, 18, 1, 32)
-    monkeypatch.setattr("prefect_docker.projects.steps.pendulum", mock_pendulum)
+    monkeypatch.setattr("prefect_docker.deployments.steps.pendulum", mock_pendulum)
     return mock_pendulum
 
 

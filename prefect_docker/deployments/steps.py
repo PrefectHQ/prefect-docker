@@ -1,16 +1,16 @@
 """
-Prefect project steps for building and pushing Docker images.
+Prefect deployment steps for building and pushing Docker images.
 
 
-These steps can be used in a project's `prefect.yaml` file to define the default
-build steps for the entire project, or they can be used in a project's
-`deplyment.yaml` file to define the build step for a specific deployment.
+These steps can be used in a `prefect.yaml` file to define the default
+build steps for a group of deployments, or they can be used to define
+the build step for a specific deployment.
 
 !!! example
-    Build a Docker image as part of a Prefect project deployment:
+    Build a Docker image before deploying a flow:
     ```yaml
     build:
-        - prefect_docker.projects.steps.build_docker_image:
+        - prefect_docker.deployments.steps.build_docker_image:
             requires: prefect-docker
             image_name: repo-name/image-name
             tag: dev
@@ -62,7 +62,7 @@ def build_docker_image(
     """
     Builds a Docker image for a Prefect deployment.
 
-    Can be used within the `prefect.yaml` file of a Prefect project to build a Docker
+    Can be used within a `prefect.yaml` file to build a Docker
     image prior to creating or updating a deployment.
 
     Args:
@@ -86,7 +86,7 @@ def build_docker_image(
         Build and push a Docker image prior to creating a deployment:
         ```yaml
         build:
-            - prefect_docker.projects.steps.build_docker_image:
+            - prefect_docker.deployments.steps.build_docker_image:
                 requires: prefect-docker
                 image_name: repo-name/image-name
                 tag: dev
@@ -96,7 +96,7 @@ def build_docker_image(
         Build a Docker image without pushing it to a remote registry:
         ```yaml
         build:
-            - prefect_docker.projects.steps.build_docker_image:
+            - prefect_docker.deployments.steps.build_docker_image:
                 requires: prefect-docker
                 image_name: repo-name/image-name
                 tag: dev
@@ -106,7 +106,7 @@ def build_docker_image(
         Build a Docker image using an auto-generated Dockerfile:
         ```yaml
         build:
-            - prefect_docker.projects.steps.build_docker_image:
+            - prefect_docker.deployments.steps.build_docker_image:
                 requires: prefect-docker
                 image_name: repo-name/image-name
                 tag: dev
@@ -118,7 +118,7 @@ def build_docker_image(
         registry:
         ```yaml
         build:
-            - prefect_docker.projects.steps.build_docker_image:
+            - prefect_docker.deployments.steps.build_docker_image:
                 requires: prefect-docker
                 image_name: repo-name/image-name
                 tag: dev
@@ -130,7 +130,7 @@ def build_docker_image(
         Build a Docker image for a different platform:
         ```yaml
         build:
-            - prefect_docker.projects.steps.build_docker_image:
+            - prefect_docker.deployments.steps.build_docker_image:
                 requires: prefect-docker
                 image_name: repo-name/image-name
                 tag: dev
