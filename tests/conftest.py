@@ -5,10 +5,10 @@ from contextlib import contextmanager
 from typing import Generator
 from unittest.mock import MagicMock, patch
 
-from prefect.docker import IMAGE_LABELS, silence_docker_warnings
 from prefect.server.database.alembic_commands import alembic_upgrade
 from prefect.testing.fixtures import *  # noqa
 from prefect.testing.utilities import prefect_test_harness
+from prefect.utilities.dockerutils import IMAGE_LABELS, silence_docker_warnings
 
 from prefect_docker.worker import CONTAINER_LABELS
 

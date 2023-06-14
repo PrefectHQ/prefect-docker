@@ -24,7 +24,7 @@ from typing import Dict, Optional
 import docker.errors
 import pendulum
 from docker.models.images import Image
-from prefect.docker import (
+from prefect.utilities.dockerutils import (
     IMAGE_LABELS,
     BuildError,
     docker_client,

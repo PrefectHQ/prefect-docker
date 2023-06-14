@@ -7,7 +7,7 @@ import docker.models.containers
 import docker.models.images
 import pendulum
 import prefect
-import prefect.docker
+import prefect.utilities.dockerutils
 import pytest
 
 from prefect_docker.deployments.steps import build_docker_image
@@ -59,7 +59,7 @@ def mock_docker_client(monkeypatch):
     mock_client.api = fake_api
 
     mock_docker_client_func = MagicMock(
-        name="docker_client", spec=prefect.docker.docker_client
+        name="docker_client", spec=prefect.utilities.dockerutils.docker_client
     )
     mock_docker_client_func.return_value.__enter__.return_value = mock_client
     monkeypatch.setattr(
