@@ -11,9 +11,16 @@ the build step for a specific deployment.
     ```yaml
     build:
         - prefect_docker.deployments.steps.build_docker_image:
+            id: build-image
             requires: prefect-docker
             image_name: repo-name/image-name
             tag: dev
+
+    push:
+        - prefect_docker.deployments.steps.push_docker_image:
+            requires: prefect-docker
+            image_name: "{{ build-image.image_name }}"
+            tag: "{{ build-image.tag }}"
     ```
 """
 import os
@@ -24,6 +31,7 @@ from typing import Dict, Optional
 import docker.errors
 import pendulum
 from docker.models.images import Image
+from prefect._internal.compatibility.deprecated import deprecated_parameter
 from prefect.utilities.dockerutils import (
     IMAGE_LABELS,
     BuildError,
@@ -40,17 +48,38 @@ class BuildDockerImageResult(TypedDict):
 
     Attributes:
         image_name: The name of the built image.
-        image_tag: The tag of the built image.
+        tag: The tag of the built image.
         image: The name and tag of the built image.
         image_id: The ID of the built image.
     """
 
     image_name: str
-    image_tag: str
+    tag: str
     image: str
     image_id: str
 
 
+class PushDockerImageResult(TypedDict):
+    """
+    The result of a `push_docker_image` step.
+
+    Attributes:
+        image_name: The name of the pushed image.
+        tag: The tag of the pushed image.
+        image: The name and tag of the pushed image.
+    """
+
+    image_name: str
+    tag: str
+    image: str
+
+
+@deprecated_parameter(
+    "push",
+    when=lambda y: y is True,
+    start_date="Jun 2023",
+    help="Use the `push_docker_image` step instead.",
+)
 def build_docker_image(
     image_name: str,
     dockerfile: str = "Dockerfile",
@@ -71,7 +100,7 @@ def build_docker_image(
         dockerfile: The path to the Dockerfile used to build the image. If "auto" is
             passed, a temporary Dockerfile will be created to build the image.
         tag: The tag to apply to the built image.
-        push: Whether to push the built image to the registry.
+        push: DEPRECATED: Whether to push the built image to the registry.
         credentials: A dictionary containing the username, password, and URL for the
             registry to push the image to.
         **build_kwargs: Additional keyword arguments to pass to Docker when building
@@ -90,17 +119,6 @@ def build_docker_image(
                 requires: prefect-docker
                 image_name: repo-name/image-name
                 tag: dev
-                push: true
-        ```
-
-        Build a Docker image without pushing it to a remote registry:
-        ```yaml
-        build:
-            - prefect_docker.deployments.steps.build_docker_image:
-                requires: prefect-docker
-                image_name: repo-name/image-name
-                tag: dev
-                push: false
         ```
 
         Build a Docker image using an auto-generated Dockerfile:
@@ -114,18 +132,6 @@ def build_docker_image(
                 push: false
         ```
 
-        Build a Docker image using an auto-generated Dockerfile and push it to a private
-        registry:
-        ```yaml
-        build:
-            - prefect_docker.deployments.steps.build_docker_image:
-                requires: prefect-docker
-                image_name: repo-name/image-name
-                tag: dev
-                dockerfile: auto
-                push: false
-                credentials: "{{ prefect.blocks.docker-registry-credentials.dev-registry }}"
-        ```
 
         Build a Docker image for a different platform:
         ```yaml
@@ -199,17 +205,17 @@ def build_docker_image(
         if not tag:
             tag = slugify(pendulum.now("utc").isoformat())
 
-        if credentials is not None:
-            client.login(
-                username=credentials.get("username"),
-                password=credentials.get("password"),
-                registry=credentials.get("registry_url"),
-                reauth=credentials.get("reauth", True),
-            )
         image: Image = client.images.get(image_id)
         image.tag(repository=image_name, tag=tag)
 
         if push:
+            if credentials is not None:
+                client.login(
+                    username=credentials.get("username"),
+                    password=credentials.get("password"),
+                    registry=credentials.get("registry_url"),
+                    reauth=credentials.get("reauth", True),
+                )
             events = client.api.push(
                 repository=image_name, tag=tag, stream=True, decode=True
             )
@@ -228,7 +234,71 @@ def build_docker_image(
 
     return {
         "image_name": image_name,
-        "image_tag": tag,
+        "tag": tag,
         "image": f"{image_name}:{tag}",
         "image_id": image_id,
+    }
+
+
+def push_docker_image(
+    image_name: str, tag: Optional[str] = None, credentials: Optional[Dict] = None
+) -> PushDockerImageResult:
+    """
+    Push a Docker image to a remote registry.
+
+    Args:
+        image_name: The name of the Docker image to push, including the registry and
+            repository.
+        tag: The tag of the Docker image to push.
+        credentials: A dictionary containing the username, password, and URL for the
+            registry to push the image to.
+
+    Returns:
+        A dictionary containing the image name and tag of the
+            pushed image.
+
+    Examples:
+        Build and push a Docker image to a private repository:
+        ```yaml
+        build:
+            - prefect_docker.deployments.steps.build_docker_image:
+                id: build-image
+                requires: prefect-docker
+                image_name: repo-name/image-name
+                tag: dev
+                dockerfile: auto
+
+        push:
+            - prefect_docker.deployments.steps.push_docker_image:
+                requires: prefect-docker
+                image_name: "{{ build-image.image_name }}"
+                tag: "{{ build-image.tag }}"
+                credentials: "{{ prefect.blocks.docker-registry-credentials.dev-registry }}"
+        ```
+    """  # noqa
+    with docker_client() as client:
+        if credentials is not None:
+            client.login(
+                username=credentials.get("username"),
+                password=credentials.get("password"),
+                registry=credentials.get("registry_url"),
+                reauth=credentials.get("reauth", True),
+            )
+        events = client.api.push(
+            repository=image_name, tag=tag, stream=True, decode=True
+        )
+        for event in events:
+            if "status" in event:
+                sys.stdout.write(event["status"])
+                if "progress" in event:
+                    sys.stdout.write(" " + event["progress"])
+                sys.stdout.write("\n")
+                sys.stdout.flush()
+            elif "error" in event:
+                raise OSError(event["error"])
+
+    return {
+        "image_name": image_name,
+        "tag": tag,
+        "image": f"{image_name}:{tag}",
     }
