@@ -17,7 +17,7 @@
         <link rel="next" href="../images/">
       
       <link rel="icon" href="../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.10">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.15">
     
     
       
@@ -25,10 +25,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.85bb2934.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.a6bdf11c.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
       
       
 
@@ -404,14 +404,14 @@
       
       
         <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
-          Projects
+          Deployments
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
-          Projects
+          Deployments
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -421,7 +421,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../projects/steps/" class="md-nav__link">
+      <a href="../deployments/steps/" class="md-nav__link">
         Steps
       </a>
     </li>
@@ -609,7 +609,11 @@
           <td>
                 <code>str</code>
           </td>
-          <td><p>The image to run.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The image to run.</p>
+            </div>
+          </td>
           <td>
               <em>required</em>
           </td>
@@ -619,7 +623,11 @@
           <td>
                 <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str]]]</code>
           </td>
-          <td><p>The command(s) to run in the container.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The command(s) to run in the container.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -629,7 +637,11 @@
           <td>
                 <code><span title="typing.Optional">Optional</span>[str]</code>
           </td>
-          <td><p>The name for this container.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The name for this container.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -639,7 +651,11 @@
           <td>
                 <code><span title="typing.Optional">Optional</span>[bool]</code>
           </td>
-          <td><p>Run container in the background.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Run container in the background.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -649,7 +665,11 @@
           <td>
                 <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="prefect_docker.host.DockerHost" href="../host/#prefect_docker.host.DockerHost">DockerHost</a>]</code>
           </td>
-          <td><p>Settings for interacting with a Docker host.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Settings for interacting with a Docker host.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -659,7 +679,11 @@
           <td>
                 <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[str, <span title="typing.List">List</span>[str]]]</code>
           </td>
-          <td><p>The entrypoint for the container.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The entrypoint for the container.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -669,8 +693,12 @@
           <td>
                 <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="typing.Dict">Dict</span>[str, str], <span title="typing.List">List</span>[str]]]</code>
           </td>
-          <td><p>Environment variables to set inside the container,
-as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Environment variables to set inside the container,
+as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -680,8 +708,12 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
           </td>
-          <td><p>Additional keyword arguments to pass to
-<a href="https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.create"><code>client.containers.create</code></a>.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Additional keyword arguments to pass to
+<a href="https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.create"><code>client.containers.create</code></a>.</p>
+            </div>
+          </td>
           <td>
                 <code>{}</code>
           </td>
@@ -702,7 +734,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="docker.models.containers.Container">Container</span></code>
           </td>
-          <td><p>A Docker Container object.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>A Docker Container object.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
@@ -883,7 +919,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code>str</code>
           </td>
-          <td><p>The container ID to pull logs from.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The container ID to pull logs from.</p>
+            </div>
+          </td>
           <td>
               <em>required</em>
           </td>
@@ -893,7 +933,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="prefect_docker.host.DockerHost" href="../host/#prefect_docker.host.DockerHost">DockerHost</a>]</code>
           </td>
-          <td><p>Settings for interacting with a Docker host.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Settings for interacting with a Docker host.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -903,8 +947,12 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
           </td>
-          <td><p>Additional keyword arguments to pass to
-<a href="https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.logs"><code>client.containers.get(container_id).logs</code></a>.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Additional keyword arguments to pass to
+<a href="https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.logs"><code>client.containers.get(container_id).logs</code></a>.</p>
+            </div>
+          </td>
           <td>
                 <code>{}</code>
           </td>
@@ -925,7 +973,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code>str</code>
           </td>
-          <td><p>The Container's logs.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The Container's logs.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
@@ -1066,7 +1118,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code>str</code>
           </td>
-          <td><p>The container ID to remove.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The container ID to remove.</p>
+            </div>
+          </td>
           <td>
               <em>required</em>
           </td>
@@ -1076,7 +1132,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="prefect_docker.host.DockerHost" href="../host/#prefect_docker.host.DockerHost">DockerHost</a>]</code>
           </td>
-          <td><p>Settings for interacting with a Docker host.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Settings for interacting with a Docker host.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -1086,8 +1146,12 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
           </td>
-          <td><p>Additional keyword arguments to pass to
-<a href="https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.remove"><code>client.containers.get(container_id).remove</code></a>.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Additional keyword arguments to pass to
+<a href="https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.remove"><code>client.containers.get(container_id).remove</code></a>.</p>
+            </div>
+          </td>
           <td>
                 <code>{}</code>
           </td>
@@ -1108,7 +1172,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="docker.models.containers.Container">Container</span></code>
           </td>
-          <td><p>The Docker Container object.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The Docker Container object.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
@@ -1247,7 +1315,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code>str</code>
           </td>
-          <td><p>The container ID to start.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The container ID to start.</p>
+            </div>
+          </td>
           <td>
               <em>required</em>
           </td>
@@ -1257,7 +1329,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="prefect_docker.host.DockerHost" href="../host/#prefect_docker.host.DockerHost">DockerHost</a>]</code>
           </td>
-          <td><p>Settings for interacting with a Docker host.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Settings for interacting with a Docker host.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -1267,8 +1343,12 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
           </td>
-          <td><p>Additional keyword arguments to pass to
-<a href="https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.start"><code>client.containers.get(container_id).start</code></a>.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Additional keyword arguments to pass to
+<a href="https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.start"><code>client.containers.get(container_id).start</code></a>.</p>
+            </div>
+          </td>
           <td>
                 <code>{}</code>
           </td>
@@ -1289,7 +1369,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="docker.models.containers.Container">Container</span></code>
           </td>
-          <td><p>The Docker Container object.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The Docker Container object.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
@@ -1428,7 +1512,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code>str</code>
           </td>
-          <td><p>The container ID to stop.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The container ID to stop.</p>
+            </div>
+          </td>
           <td>
               <em>required</em>
           </td>
@@ -1438,7 +1526,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="prefect_docker.host.DockerHost" href="../host/#prefect_docker.host.DockerHost">DockerHost</a>]</code>
           </td>
-          <td><p>Settings for interacting with a Docker host.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Settings for interacting with a Docker host.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -1448,8 +1540,12 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
           </td>
-          <td><p>Additional keyword arguments to pass to
-<a href="https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.stop"><code>client.containers.get(container_id).stop</code></a>.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Additional keyword arguments to pass to
+<a href="https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.Container.stop"><code>client.containers.get(container_id).stop</code></a>.</p>
+            </div>
+          </td>
           <td>
                 <code>{}</code>
           </td>
@@ -1470,7 +1566,11 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
           <td>
                 <code><span title="docker.models.containers.Container">Container</span></code>
           </td>
-          <td><p>The Docker Container object.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The Docker Container object.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
@@ -1727,7 +1827,7 @@ as a dictionary or a list of strings in the format ["SOMEVARIABLE=xxx"].</p></td
     <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.fac441b0.min.js"></script>
+      <script src="../assets/javascripts/bundle.b4d07000.min.js"></script>
       
     
   </body>

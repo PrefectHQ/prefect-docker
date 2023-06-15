@@ -14,10 +14,10 @@
         <link rel="prev" href="../containers/">
       
       
-        <link rel="next" href="../projects/steps/">
+        <link rel="next" href="../deployments/steps/">
       
       <link rel="icon" href="../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.10">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.15">
     
     
       
@@ -25,10 +25,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.85bb2934.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.a6bdf11c.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
       
       
 
@@ -376,14 +376,14 @@
       
       
         <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
-          Projects
+          Deployments
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
-          Projects
+          Deployments
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -393,7 +393,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../projects/steps/" class="md-nav__link">
+      <a href="../deployments/steps/" class="md-nav__link">
         Steps
       </a>
     </li>
@@ -554,7 +554,11 @@
           <td>
                 <code>str</code>
           </td>
-          <td><p>The repository to pull.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The repository to pull.</p>
+            </div>
+          </td>
           <td>
               <em>required</em>
           </td>
@@ -564,7 +568,11 @@
           <td>
                 <code><span title="typing.Optional">Optional</span>[str]</code>
           </td>
-          <td><p>The tag to pull; if not provided, it is set to latest.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The tag to pull; if not provided, it is set to latest.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -574,7 +582,11 @@
           <td>
                 <code><span title="typing.Optional">Optional</span>[str]</code>
           </td>
-          <td><p>Platform in the format os[/arch[/variant]].</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Platform in the format os[/arch[/variant]].</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -584,7 +596,11 @@
           <td>
                 <code>bool</code>
           </td>
-          <td><p>Pull all image tags which will return a list of Images.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Pull all image tags which will return a list of Images.</p>
+            </div>
+          </td>
           <td>
                 <code>False</code>
           </td>
@@ -594,8 +610,12 @@
           <td>
                 <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="prefect_docker.host.DockerHost" href="../host/#prefect_docker.host.DockerHost">DockerHost</a>]</code>
           </td>
-          <td><p>Settings for interacting with a Docker host; if not
-provided, will automatically instantiate a <code>DockerHost</code> from env.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Settings for interacting with a Docker host; if not
+provided, will automatically instantiate a <code>DockerHost</code> from env.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -605,8 +625,12 @@ provided, will automatically instantiate a <code>DockerHost</code> from env.</p>
           <td>
                 <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="prefect_docker.credentials.DockerRegistryCredentials" href="../credentials/#prefect_docker.credentials.DockerRegistryCredentials">DockerRegistryCredentials</a>]</code>
           </td>
-          <td><p>Docker credentials used to log in to
-a registry before pulling the image.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Docker credentials used to log in to
+a registry before pulling the image.</p>
+            </div>
+          </td>
           <td>
                 <code>None</code>
           </td>
@@ -616,7 +640,11 @@ a registry before pulling the image.</p></td>
           <td>
                 <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
           </td>
-          <td><p>Additional keyword arguments to pass to <code>client.images.pull</code>.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Additional keyword arguments to pass to <code>client.images.pull</code>.</p>
+            </div>
+          </td>
           <td>
                 <code>{}</code>
           </td>
@@ -637,7 +665,11 @@ a registry before pulling the image.</p></td>
           <td>
                 <code><span title="typing.Union">Union</span>[<span title="docker.models.images.Image">Image</span>, <span title="typing.List">List</span>[<span title="docker.models.images.Image">Image</span>]]</code>
           </td>
-          <td><p>The image that has been pulled, or a list of images if <code>all_tags</code> is <code>True</code>.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The image that has been pulled, or a list of images if <code>all_tags</code> is <code>True</code>.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
@@ -963,7 +995,7 @@ a registry before pulling the image.</p></td>
     <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.fac441b0.min.js"></script>
+      <script src="../assets/javascripts/bundle.b4d07000.min.js"></script>
       
     
   </body>

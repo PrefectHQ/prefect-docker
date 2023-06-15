@@ -11,11 +11,11 @@
         <link rel="canonical" href="https://PrefectHQ.github.io/prefect-docker/worker/">
       
       
-        <link rel="prev" href="../projects/steps/">
+        <link rel="prev" href="../deployments/steps/">
       
       
       <link rel="icon" href="../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.10">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.15">
     
     
       
@@ -23,10 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.85bb2934.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.a6bdf11c.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
       
       
 
@@ -313,14 +313,14 @@
       
       
         <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
-          Projects
+          Deployments
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
-          Projects
+          Deployments
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -330,7 +330,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../projects/steps/" class="md-nav__link">
+      <a href="../deployments/steps/" class="md-nav__link">
         Steps
       </a>
     </li>
@@ -1095,11 +1095,41 @@ checkout out the <a href="https://docs.prefect.io/concepts/work-pools/">Prefect 
 <span class="normal">734</span>
 <span class="normal">735</span>
 <span class="normal">736</span>
-<span class="normal">737</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DockerWorker</span><span class="p">(</span><span class="n">BaseWorker</span><span class="p">):</span>
+<span class="normal">737</span>
+<span class="normal">738</span>
+<span class="normal">739</span>
+<span class="normal">740</span>
+<span class="normal">741</span>
+<span class="normal">742</span>
+<span class="normal">743</span>
+<span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DockerWorker</span><span class="p">(</span><span class="n">BaseWorker</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prefect worker that executes flow runs within Docker containers.&quot;&quot;&quot;</span>
 
     <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;docker&quot;</span>
     <span class="n">job_configuration</span> <span class="o">=</span> <span class="n">DockerWorkerJobConfiguration</span>
+    <span class="n">_description</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Execute flow runs within Docker containers. Works well for managing flow &quot;</span>
+        <span class="s2">&quot;execution environments via Docker images. Requires access to a running &quot;</span>
+        <span class="s2">&quot;Docker daemon.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">_display_name</span> <span class="o">=</span> <span class="s2">&quot;Docker&quot;</span>
+    <span class="n">_documentation_url</span> <span class="o">=</span> <span class="s2">&quot;https://prefecthq.github.io/prefect-docker/worker/&quot;</span>
+    <span class="n">_is_beta</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_logo_url</span> <span class="o">=</span> <span class="s2">&quot;https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250&quot;</span>  <span class="c1"># noqa</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">test_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">test_mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1270,7 +1300,11 @@ checkout out the <a href="https://docs.prefect.io/concepts/work-pools/">Prefect 
             <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pulling image </span><span class="si">{</span><span class="n">configuration</span><span class="o">.</span><span class="n">image</span><span class="si">!r}</span><span class="s2">...&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_pull_image</span><span class="p">(</span><span class="n">docker_client</span><span class="p">,</span> <span class="n">configuration</span><span class="p">)</span>
 
-        <span class="n">container</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_container</span><span class="p">(</span><span class="n">docker_client</span><span class="p">,</span> <span class="o">**</span><span class="n">container_settings</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">container</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_container</span><span class="p">(</span><span class="n">docker_client</span><span class="p">,</span> <span class="o">**</span><span class="n">container_settings</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_emit_container_creation_failed_event</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">exc</span>
 
         <span class="n">created_event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_emit_container_status_change_event</span><span class="p">(</span>
             <span class="n">container</span><span class="p">,</span> <span class="n">configuration</span>
@@ -1450,6 +1484,16 @@ checkout out the <a href="https://docs.prefect.io/concepts/work-pools/">Prefect 
             <span class="s2">&quot;prefect.resource.name&quot;</span><span class="p">:</span> <span class="n">container</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
         <span class="p">}</span>
 
+    <span class="k">def</span> <span class="nf">_emit_container_creation_failed_event</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">:</span> <span class="n">DockerWorkerJobConfiguration</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Event</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a Prefect event when a docker container fails to be created.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">emit_event</span><span class="p">(</span>
+            <span class="n">event</span><span class="o">=</span><span class="s2">&quot;prefect.docker.container.creation-failed&quot;</span><span class="p">,</span>
+            <span class="n">resource</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_event_resource</span><span class="p">(),</span>
+            <span class="n">related</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_event_related_resources</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">),</span>
+        <span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">_emit_container_status_change_event</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">container</span><span class="p">:</span> <span class="s2">&quot;Container&quot;</span><span class="p">,</span>
@@ -1457,8 +1501,6 @@ checkout out the <a href="https://docs.prefect.io/concepts/work-pools/">Prefect 
         <span class="n">last_event</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Event</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Event</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a Prefect event for a Docker container event.&quot;&quot;&quot;</span>
-        <span class="n">resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_container_as_resource</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
-
         <span class="n">related</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_event_related_resources</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="n">configuration</span><span class="p">)</span>
 
         <span class="n">worker_resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_event_resource</span><span class="p">()</span>
@@ -1467,7 +1509,7 @@ checkout out the <a href="https://docs.prefect.io/concepts/work-pools/">Prefect 
 
         <span class="k">return</span> <span class="n">emit_event</span><span class="p">(</span>
             <span class="n">event</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;prefect.docker.container.</span><span class="si">{</span><span class="n">container</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="n">resource</span><span class="o">=</span><span class="n">resource</span><span class="p">,</span>
+            <span class="n">resource</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_container_as_resource</span><span class="p">(</span><span class="n">container</span><span class="p">),</span>
             <span class="n">related</span><span class="o">=</span><span class="n">related</span> <span class="o">+</span> <span class="p">[</span><span class="n">worker_related_resource</span><span class="p">],</span>
             <span class="n">follows</span><span class="o">=</span><span class="n">last_event</span><span class="p">,</span>
         <span class="p">)</span>
@@ -1507,16 +1549,7 @@ PID.</p>
 
       <details class="quote">
         <summary>Source code in <code>prefect_docker/worker.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span>
-<span class="normal">424</span>
-<span class="normal">425</span>
-<span class="normal">426</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">426</span>
 <span class="normal">427</span>
 <span class="normal">428</span>
 <span class="normal">429</span>
@@ -1538,7 +1571,16 @@ PID.</p>
 <span class="normal">445</span>
 <span class="normal">446</span>
 <span class="normal">447</span>
-<span class="normal">448</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">kill_infrastructure</span><span class="p">(</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">kill_infrastructure</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">infrastructure_pid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="n">DockerWorkerJobConfiguration</span><span class="p">,</span>
@@ -1597,16 +1639,7 @@ to complete.</p>
 
       <details class="quote">
         <summary>Source code in <code>prefect_docker/worker.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">385</span>
-<span class="normal">386</span>
-<span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
-<span class="normal">391</span>
-<span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">394</span>
 <span class="normal">395</span>
 <span class="normal">396</span>
 <span class="normal">397</span>
@@ -1627,7 +1660,16 @@ to complete.</p>
 <span class="normal">412</span>
 <span class="normal">413</span>
 <span class="normal">414</span>
-<span class="normal">415</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">flow_run</span><span class="p">:</span> <span class="s2">&quot;FlowRun&quot;</span><span class="p">,</span>
     <span class="n">configuration</span><span class="p">:</span> <span class="n">BaseJobConfiguration</span><span class="p">,</span>
@@ -1707,105 +1749,161 @@ flow run as a Docker container.</p>
           <td><code>name</code></td>
           <td>
           </td>
-          <td><p>The name to give to created Docker containers.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The name to give to created Docker containers.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>command</code></td>
           <td>
           </td>
-          <td><p>The command executed in created Docker containers to kick off
-flow run execution.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The command executed in created Docker containers to kick off
+flow run execution.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>env</code></td>
           <td>
           </td>
-          <td><p>The environment variables to set in created Docker containers.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The environment variables to set in created Docker containers.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>labels</code></td>
           <td>
           </td>
-          <td><p>The labels to set on created Docker containers.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The labels to set on created Docker containers.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>image</code></td>
           <td>
                 <code>str</code>
           </td>
-          <td><p>The image reference of a container image to use for created jobs.
-If not set, the latest Prefect image will be used.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The image reference of a container image to use for created jobs.
+If not set, the latest Prefect image will be used.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>image_pull_policy</code></td>
           <td>
                 <code><span title="typing.Optional">Optional</span>[<span title="typing_extensions.Literal">Literal</span>[&#39;IfNotPresent&#39;, &#39;Always&#39;, &#39;Never&#39;]]</code>
           </td>
-          <td><p>The image pull policy to use when pulling images.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The image pull policy to use when pulling images.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>networks</code></td>
           <td>
                 <code><span title="typing.List">List</span>[str]</code>
           </td>
-          <td><p>Docker networks that created containers should be connected to.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Docker networks that created containers should be connected to.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>network_mode</code></td>
           <td>
                 <code><span title="typing.Optional">Optional</span>[str]</code>
           </td>
-          <td><p>The network mode for the created containers (e.g. host, bridge).
-If 'networks' is set, this cannot be set.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>The network mode for the created containers (e.g. host, bridge).
+If 'networks' is set, this cannot be set.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>auto_remove</code></td>
           <td>
                 <code>bool</code>
           </td>
-          <td><p>If set, containers will be deleted on completion.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>If set, containers will be deleted on completion.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>volumes</code></td>
           <td>
                 <code><span title="typing.List">List</span>[str]</code>
           </td>
-          <td><p>Docker volumes that should be mounted in created containers.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Docker volumes that should be mounted in created containers.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>stream_output</code></td>
           <td>
                 <code>bool</code>
           </td>
-          <td><p>If set, the output from created containers will be streamed
-to local standard output.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>If set, the output from created containers will be streamed
+to local standard output.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>mem_limit</code></td>
           <td>
                 <code><span title="typing.Optional">Optional</span>[str]</code>
           </td>
-          <td><p>Memory limit of created containers. Accepts a value
+          <td>
+            <div class="doc-md-description">
+              <p>Memory limit of created containers. Accepts a value
 with a unit identifier (e.g. 100000b, 1000k, 128m, 1g.) If a value is
-given without a unit, bytes are assumed.</p></td>
+given without a unit, bytes are assumed.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>memswap_limit</code></td>
           <td>
                 <code><span title="typing.Optional">Optional</span>[str]</code>
           </td>
-          <td><p>Total memory (memory + swap), -1 to disable swap. Should only be
+          <td>
+            <div class="doc-md-description">
+              <p>Total memory (memory + swap), -1 to disable swap. Should only be
 set if <code>mem_limit</code> is also set. If <code>mem_limit</code> is set, this defaults to
 allowing the container to use as much swap as memory. For example, if
 <code>mem_limit</code> is 300m and <code>memswap_limit</code> is not set, containers can use
-600m in total of memory and swap.</p></td>
+600m in total of memory and swap.</p>
+            </div>
+          </td>
         </tr>
         <tr>
           <td><code>privileged</code></td>
           <td>
                 <code>bool</code>
           </td>
-          <td><p>Give extended privileges to created containers.</p></td>
+          <td>
+            <div class="doc-md-description">
+              <p>Give extended privileges to created containers.</p>
+            </div>
+          </td>
         </tr>
     </tbody>
   </table>
@@ -2903,7 +3001,7 @@ attributes.</p>
     <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.fac441b0.min.js"></script>
+      <script src="../assets/javascripts/bundle.b4d07000.min.js"></script>
       
     
   </body>
