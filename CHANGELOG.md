@@ -9,6 +9,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 0.3.0
+
+Released June 15th, 2023.
+
+Note this release contains a breaking change to the `build_docker_image` step. The `image_name` output key has been changed to only include the image name and not the image tag. The `image` output key now contains the image name and image tag and can be used in situations where `image_name` was previously used.
+
+If you were previously using `build_docker_image` in your `prefect.yaml` or `deployment.yaml` file, you'll need to update your `image_name` references.
+
+For example, if you were using `image_name` in your work pool job variables:
+
+``` yaml
+work_pool:
+  name: my-work-pool
+  job_variables:
+    image: "{{ image_name }}"
+```
+
+you'll need to use `image` instead:
+
+```yaml
+work_pool:
+  name: my-work-pool
+  job_variables:
+    image: "{{ image }}"
+```
+
+Alternatively, you can put an upper version limit on the version of `prefect-docker` used for `build_docker_image` in your `prefect.yaml` file:
+
+```yaml
+build:
+- prefect_docker.projects.steps.build_docker_image:
+    id: build_image
+    requires: prefect-docker>=0.2.0<0.3.0
+    image_name: my-image
+    tag: my-tag
+    dockerfile: auto
+    push: true
+```
+
+### Added
+
 - Emit a Prefect event when creation of a docker container fails - [#50](https://github.com/PrefectHQ/prefect-docker/pull/50)
 - Ability to pass build kwargs into `build_docker_image` - [#51](https://github.com/PrefectHQ/prefect-docker/pull/51)
 - `image_id` and `image` to `build_docker_image` output. image has the same contents as the current `image_name` - [#51](https://github.com/PrefectHQ/prefect-docker/pull/51)
@@ -23,11 +74,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `prefect_docker.projects` module. Use `prefect_docker.deployments` instead. - [#63](https://github.com/PrefectHQ/prefect-docker/pull/63)
 - `push` on `build_docker_image`. Use `push_docker_image` instead. - [#64](https://github.com/PrefectHQ/prefect-docker/pull/64)
 
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.2.2
 
