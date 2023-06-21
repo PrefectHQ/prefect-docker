@@ -208,10 +208,6 @@ def test_real_auto_dockerfile_build(docker_client_with_cleanup):
         cases = [
             {"command": "prefect version", "expected": prefect.__version__},
             {"command": "ls", "expected": "requirements.txt"},
-            {
-                "command": "python -c 'import pandas; print(pandas.__version__)'",
-                "expected": "2",
-            },
         ]
 
         for case in cases:
@@ -222,6 +218,17 @@ def test_real_auto_dockerfile_build(docker_client_with_cleanup):
                 remove=True,
             )
             assert case["expected"] in output.decode()
+
+        output = docker_client_with_cleanup.containers.run(
+            image=result["image"],
+            command="python -c 'import pandas; print(pandas.__version__)'",
+            labels=["prefect-docker-test"],
+            remove=True,
+        )
+        if sys.version_info >= (3, 8):
+            assert 2 in output.decode()
+        else:
+            assert 1 in output.decode()
 
     finally:
         docker_client_with_cleanup.containers.prune(
