@@ -1,22 +1,15 @@
 import asyncio
 import logging
 import sys
-from contextlib import contextmanager
-from typing import Generator
 from unittest.mock import MagicMock, patch
 
 from prefect.server.database.alembic_commands import alembic_upgrade
 from prefect.testing.fixtures import *  # noqa
 from prefect.testing.utilities import prefect_test_harness
-from prefect.utilities.dockerutils import IMAGE_LABELS, silence_docker_warnings
-
-from prefect_docker.worker import CONTAINER_LABELS
+from prefect.utilities.dockerutils import silence_docker_warnings
 
 with silence_docker_warnings():
-    import docker
     from docker import DockerClient
-    from docker.models.containers import Container
-    from docker.errors import APIError
 
 import pytest
 
@@ -139,41 +132,3 @@ def mock_docker_registry_credentials():
     docker_registry_credentials = MagicMock()
     docker_registry_credentials.login.side_effect = mock_login
     return docker_registry_credentials
-
-
-@pytest.fixture(scope="session")
-def docker_client_with_cleanup(worker_id: str) -> Generator[DockerClient, None, None]:
-    client = None
-    try:
-        client = docker.from_env()
-        with cleanup_all_new_docker_objects(client, worker_id):
-            yield client
-    finally:
-        if client is not None:
-            client.close()
-
-
-@contextmanager
-def cleanup_all_new_docker_objects(docker: DockerClient, worker_id: str):
-    IMAGE_LABELS["io.prefect.test-worker"] = worker_id
-    CONTAINER_LABELS["io.prefect.test-worker"] = worker_id
-    try:
-        yield
-    finally:
-        for container in docker.containers.list(all=True):
-            if container.labels.get("io.prefect.test-worker") == worker_id:
-                _safe_remove_container(container)
-            elif container.labels.get("io.prefect.delete-me"):
-                _safe_remove_container(container)
-
-        filters = {"label": f"io.prefect.test-worker={worker_id}"}
-        for image in docker.images.list(filters=filters):
-            for tag in image.tags:
-                docker.images.remove(tag, force=True)
-
-
-def _safe_remove_container(container: Container):
-    try:
-        container.remove(force=True)
-    except APIError:
-        pass
