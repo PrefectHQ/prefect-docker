@@ -241,3 +241,17 @@ async def test_container_result_async(
         _, container_id = worker._parse_infrastructure_pid(result.identifier)
         container = docker_client_with_cleanup.containers.get(container_id)
         assert container is not None
+
+
+@pytest.mark.flaky(max_runs=3)
+async def test_stream_container_logs_on_real_container(
+    capsys, flow_run, default_docker_worker_job_configuration
+):
+    default_docker_worker_job_configuration.command = "echo hello"
+    async with DockerWorker(work_pool_name="test") as worker:
+        await worker.run(
+            flow_run=flow_run, configuration=default_docker_worker_job_configuration
+        )
+
+    captured = capsys.readouterr()
+    assert "hello" in captured.out

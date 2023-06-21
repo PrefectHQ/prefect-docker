@@ -896,20 +896,6 @@ async def test_logs_when_unexpected_docker_error(
     )
 
 
-@pytest.mark.flaky(max_runs=3)
-async def test_stream_container_logs_on_real_container(
-    capsys, flow_run, default_docker_worker_job_configuration
-):
-    default_docker_worker_job_configuration.command = "echo hello"
-    async with DockerWorker(work_pool_name="test") as worker:
-        await worker.run(
-            flow_run=flow_run, configuration=default_docker_worker_job_configuration
-        )
-
-    captured = capsys.readouterr()
-    assert "hello" in captured.out
-
-
 async def test_worker_errors_out_on_ephemeral_apis():
     with pytest.raises(RuntimeError, match="ephemeral"):
         async with DockerWorker(work_pool_name="test", test_mode=False) as worker:
