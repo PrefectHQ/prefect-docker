@@ -104,6 +104,8 @@ def build_docker_image(
         push: DEPRECATED: Whether to push the built image to the registry.
         credentials: A dictionary containing the username, password, and URL for the
             registry to push the image to.
+        keep_dockerfile: Whether to keep the Dockerfile created by setting
+            `dockerfile="auto"`.
         **build_kwargs: Additional keyword arguments to pass to Docker when building
             the image. Available options can be found in the [`docker-py`](https://docker-py.readthedocs.io/en/stable/images.html#docker.models.images.ImageCollection.build)
             documentation.
@@ -133,7 +135,6 @@ def build_docker_image(
                 push: false
         ```
 
-
         Build a Docker image for a different platform:
         ```yaml
         build:
@@ -144,6 +145,18 @@ def build_docker_image(
                 dockerfile: Dockerfile
                 push: false
                 platform: amd64
+        ```
+
+        Keep the Dockerfile created by setting `dockerfile="auto"`:
+        ```yaml
+        build:
+            - prefect_docker.deployments.steps.build_docker_image:
+                requires: prefect-docker
+                image_name: repo-name/image-name
+                tag: dev
+                dockerfile: Dockerfile
+                push: false
+                keep_dockerfile: true
         ```
     """  # noqa
     auto_build = dockerfile == "auto"
