@@ -86,6 +86,7 @@ def build_docker_image(
     tag: Optional[str] = None,
     push: bool = False,
     credentials: Optional[Dict] = None,
+    keep_dockerfile: bool = False,
     **build_kwargs,
 ) -> BuildDockerImageResult:
     """
@@ -196,7 +197,7 @@ def build_docker_image(
                 raise BuildError(e.explanation) from e
 
         finally:
-            if auto_build:
+            if auto_build and not keep_dockerfile:
                 os.unlink(dockerfile)
 
         if not isinstance(image_id, str):
