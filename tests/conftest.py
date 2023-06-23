@@ -3,7 +3,6 @@ import logging
 import sys
 from unittest.mock import MagicMock, patch
 
-from prefect.server.database.alembic_commands import alembic_upgrade
 from prefect.testing.fixtures import *  # noqa
 from prefect.testing.utilities import prefect_test_harness
 from prefect.utilities.dockerutils import silence_docker_warnings
@@ -20,7 +19,6 @@ def prefect_db():
     Sets up test harness for temporary DB during test runs.
     """
     with prefect_test_harness():
-        alembic_upgrade()
         yield
 
 
@@ -98,14 +96,6 @@ def mock_docker_client():
         lambda container_id: mock_docker_container(container_id)
     )
     return client
-
-
-@pytest.fixture
-def mock_docker_client_new(mock_docker_client) -> MagicMock:
-    with patch.object(
-        DockerClient, "__new__", mock_docker_client
-    ) as magic_docker_client:
-        yield magic_docker_client
 
 
 @pytest.fixture

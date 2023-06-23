@@ -3,7 +3,15 @@ from unittest.mock import MagicMock
 import pytest
 from prefect.logging import disable_run_logger
 
-from prefect_docker.host import DockerHost, _ContextManageableDockerClient
+from prefect_docker.host import DockerHost
+
+
+@pytest.fixture
+def mock_ctx_docker_client(mock_docker_client, monkeypatch) -> MagicMock:
+    monkeypatch.setattr(
+        "prefect_docker.host._ContextManageableDockerClient", mock_docker_client
+    )
+    return mock_docker_client
 
 
 class TestDockerHost:
@@ -33,11 +41,10 @@ class TestDockerHost:
             assert getattr(_docker_host, key) == val
         return _docker_host
 
-    def test_get_client(self, docker_host, mock_docker_client_new: MagicMock):
+    def test_get_client(self, docker_host, mock_ctx_docker_client: MagicMock):
         with disable_run_logger():
             docker_host.get_client()
-            mock_docker_client_new.assert_called_once_with(
-                _ContextManageableDockerClient,
+            mock_ctx_docker_client.assert_called_once_with(
                 base_url="unix:///var/run/docker.sock",
                 version="1.35",
                 max_pool_size=8,
@@ -45,12 +52,11 @@ class TestDockerHost:
             )
 
     def test_context_managed_get_client(
-        self, docker_host, mock_docker_client_new: MagicMock
+        self, docker_host, mock_ctx_docker_client: MagicMock
     ):
         with disable_run_logger():
             with docker_host.get_client() as _:
-                mock_docker_client_new.assert_called_once_with(
-                    _ContextManageableDockerClient,
+                mock_ctx_docker_client.assert_called_once_with(
                     base_url="unix:///var/run/docker.sock",
                     version="1.35",
                     max_pool_size=8,
