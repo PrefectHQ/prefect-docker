@@ -41,7 +41,7 @@ def bypass_api_check(monkeypatch):
     monkeypatch.setenv("PREFECT_DOCKER_TEST_MODE", True)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def docker_client_with_cleanup(worker_id: str) -> Generator[DockerClient, None, None]:
     client = None
     try:
