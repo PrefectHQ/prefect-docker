@@ -25,8 +25,6 @@ from prefect_docker.worker import (
     DockerWorkerJobConfiguration,
 )
 
-CLIENT = docker.from_env()
-
 
 @pytest.fixture
 def default_docker_worker_job_configuration():
@@ -47,8 +45,9 @@ def bypass_api_check(monkeypatch):
 def docker_client_with_cleanup(worker_id: str) -> Generator[DockerClient, None, None]:
     client = None
     try:
-        with cleanup_all_new_docker_objects(CLIENT, worker_id):
-            yield CLIENT
+        client = docker.from_env()
+        with cleanup_all_new_docker_objects(client, worker_id):
+            yield client
     finally:
         if client is not None:
             client.close()
