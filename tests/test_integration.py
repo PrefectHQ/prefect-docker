@@ -1,5 +1,6 @@
 import os
 import sys
+import traceback
 import uuid
 from contextlib import contextmanager
 from pathlib import Path
@@ -48,6 +49,8 @@ def docker_client_with_cleanup(worker_id: str) -> Generator[DockerClient, None, 
         client = docker.from_env()
         with cleanup_all_new_docker_objects(client, worker_id):
             yield client
+    except Exception:
+        traceback.print_exc()
     finally:
         if client is not None:
             client.close()
