@@ -33,4 +33,4 @@ jobs:
         env:
           PREFECT_API_DATABASE_CONNECTION_URL: "sqlite+aiosqlite:///./prefect-tests.db"
         run: |
-          pytest tests -vvv --numprocesses 4 --dist loadscope --cov=prefect_docker/ --cov=tests/ --no-cov-on-fail
+          pytest tests -vvv --numprocesses auto --dist loadscope --cov=prefect_docker/ --cov=tests/ --no-cov-on-fail
