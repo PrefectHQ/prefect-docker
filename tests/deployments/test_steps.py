@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -190,6 +191,54 @@ def test_build_docker_image_raises_with_auto_and_existing_dockerfile():
             build_docker_image(image_name="registry/repo", dockerfile="auto")
     finally:
         Path("Dockerfile").unlink()
+
+
+@pytest.mark.flaky(max_runs=3)
+def test_real_auto_dockerfile_build(docker_client_with_cleanup):
+    os.chdir(str(Path(__file__).parent.parent / "test-project"))
+    try:
+        result = build_docker_image(
+            image_name="local/repo", tag="test", dockerfile="auto", push=False
+        )
+        image: docker.models.images.Image = docker_client_with_cleanup.images.get(
+            result["image"]
+        )
+        assert image
+
+        cases = [
+            {"command": "prefect version", "expected": prefect.__version__},
+            {"command": "ls", "expected": "requirements.txt"},
+        ]
+
+        for case in cases:
+            output = docker_client_with_cleanup.containers.run(
+                image=result["image"],
+                command=case["command"],
+                labels=["prefect-docker-test"],
+                remove=True,
+            )
+            assert case["expected"] in output.decode()
+
+        output = docker_client_with_cleanup.containers.run(
+            image=result["image"],
+            command="python -c 'import pandas; print(pandas.__version__)'",
+            labels=["prefect-docker-test"],
+            remove=True,
+        )
+        if sys.version_info >= (3, 8):
+            assert "2" in output.decode()
+        else:
+            assert "1" in output.decode()
+
+    finally:
+        docker_client_with_cleanup.containers.prune(
+            filters={"label": "prefect-docker-test"}
+        )
+        image = docker_client_with_cleanup.images.get("local/repo:test")
+        if image:
+            docker_client_with_cleanup.images.remove(
+                image="local/repo:test", force=True
+            )
 
 
 def test_push_docker_image_with_credentials(mock_docker_client, monkeypatch):

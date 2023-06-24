@@ -8,7 +8,10 @@ import docker
 import docker.errors
 import docker.models.containers
 import pytest
+from docker import DockerClient
+from docker.models.containers import Container
 from prefect.client.schemas import FlowRun
+from prefect.docker import get_prefect_image_name
 from prefect.events import RelatedResource
 from prefect.exceptions import InfrastructureNotAvailable, InfrastructureNotFound
 from prefect.settings import (
@@ -846,6 +849,122 @@ async def test_does_not_warn_about_gateway_if_not_using_linux(
     assert not call_extra_hosts
 
 
+@pytest.mark.flaky(max_runs=3)
+async def test_container_result(
+    docker_client_with_cleanup: "DockerClient",
+    flow_run,
+    default_docker_worker_job_configuration,
+):
+    async with DockerWorker(work_pool_name="test") as worker:
+        result = await worker.run(
+            flow_run=flow_run, configuration=default_docker_worker_job_configuration
+        )
+        assert bool(result)
+        assert result.status_code == 0
+        assert result.identifier
+        _, container_id = worker._parse_infrastructure_pid(result.identifier)
+        container = docker_client_with_cleanup.containers.get(container_id)
+        assert container is not None
+
+
+@pytest.mark.flaky(max_runs=3)
+async def test_container_auto_remove(
+    docker_client_with_cleanup: "DockerClient",
+    flow_run,
+    default_docker_worker_job_configuration,
+):
+    from docker.errors import NotFound
+
+    default_docker_worker_job_configuration.auto_remove = True
+
+    async with DockerWorker(work_pool_name="test") as worker:
+        result = await worker.run(
+            flow_run=flow_run, configuration=default_docker_worker_job_configuration
+        )
+        assert bool(result)
+        assert result.status_code == 0
+        assert result.identifier
+        with pytest.raises(NotFound):
+            _, container_id = worker._parse_infrastructure_pid(result.identifier)
+            docker_client_with_cleanup.containers.get(container_id)
+
+
+@pytest.mark.flaky(max_runs=3)
+async def test_container_metadata(
+    docker_client_with_cleanup: "DockerClient",
+    flow_run,
+    default_docker_worker_job_configuration,
+):
+    default_docker_worker_job_configuration.name = "test-container-name"
+    default_docker_worker_job_configuration.labels = {"test.foo": "a", "test.bar": "b"}
+    default_docker_worker_job_configuration.prepare_for_flow_run(flow_run=flow_run)
+    async with DockerWorker(work_pool_name="test") as worker:
+        result = await worker.run(
+            flow_run=flow_run, configuration=default_docker_worker_job_configuration
+        )
+
+        _, container_id = worker._parse_infrastructure_pid(result.identifier)
+    container: "Container" = docker_client_with_cleanup.containers.get(container_id)
+    assert container.name == "test-container-name"
+    assert container.labels["test.foo"] == "a"
+    assert container.labels["test.bar"] == "b"
+    assert container.image.tags[0] == get_prefect_image_name()
+
+    for key, value in CONTAINER_LABELS.items():
+        assert container.labels[key] == value
+
+
+@pytest.mark.flaky(max_runs=3)
+async def test_container_name_collision(
+    docker_client_with_cleanup: "DockerClient",
+    flow_run,
+    default_docker_worker_job_configuration,
+):
+    # Generate a unique base name to avoid collissions with existing images
+    base_name = uuid.uuid4().hex
+
+    default_docker_worker_job_configuration.name = base_name
+    default_docker_worker_job_configuration.auto_remove = False
+    default_docker_worker_job_configuration.prepare_for_flow_run(flow_run)
+    async with DockerWorker(work_pool_name="test") as worker:
+        result = await worker.run(
+            flow_run=flow_run, configuration=default_docker_worker_job_configuration
+        )
+
+        _, container_id = worker._parse_infrastructure_pid(result.identifier)
+        created_container: "Container" = docker_client_with_cleanup.containers.get(
+            container_id
+        )
+        assert created_container.name == base_name
+
+        result = await worker.run(
+            flow_run=flow_run, configuration=default_docker_worker_job_configuration
+        )
+        _, container_id = worker._parse_infrastructure_pid(result.identifier)
+        created_container: "Container" = docker_client_with_cleanup.containers.get(
+            container_id
+        )
+        assert created_container.name == base_name + "-1"
+
+
+@pytest.mark.flaky(max_runs=3)
+async def test_container_result_async(
+    docker_client_with_cleanup: "DockerClient",
+    flow_run,
+    default_docker_worker_job_configuration,
+):
+    async with DockerWorker(work_pool_name="test") as worker:
+        result = await worker.run(
+            flow_run=flow_run, configuration=default_docker_worker_job_configuration
+        )
+        assert bool(result)
+        assert result.status_code == 0
+        assert result.identifier
+        _, container_id = worker._parse_infrastructure_pid(result.identifier)
+        container = docker_client_with_cleanup.containers.get(container_id)
+        assert container is not None
+
+
 async def test_stream_container_logs(
     capsys, mock_docker_client, flow_run, default_docker_worker_job_configuration
 ):
@@ -894,6 +1013,20 @@ async def test_logs_when_unexpected_docker_error(
         "An unexpected Docker API error occured while streaming output from container"
         " fake-name." in caplog.text
     )
+
+
+@pytest.mark.flaky(max_runs=3)
+async def test_stream_container_logs_on_real_container(
+    capsys, flow_run, default_docker_worker_job_configuration
+):
+    default_docker_worker_job_configuration.command = "echo hello"
+    async with DockerWorker(work_pool_name="test") as worker:
+        await worker.run(
+            flow_run=flow_run, configuration=default_docker_worker_job_configuration
+        )
+
+    captured = capsys.readouterr()
+    assert "hello" in captured.out
 
 
 async def test_worker_errors_out_on_ephemeral_apis():
