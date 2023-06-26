@@ -108,14 +108,6 @@ def mock_docker_client():
 
 
 @pytest.fixture
-def mock_docker_client_new(mock_docker_client) -> MagicMock:
-    with patch.object(
-        DockerClient, "__new__", mock_docker_client
-    ) as magic_docker_client:
-        yield magic_docker_client
-
-
-@pytest.fixture
 def mock_docker_client_from_env(mock_docker_client) -> MagicMock:
     with patch.object(
         DockerClient, "from_env", mock_docker_client

@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -194,6 +195,7 @@ def test_build_docker_image_raises_with_auto_and_existing_dockerfile():
 
 @pytest.mark.flaky(max_runs=3)
 def test_real_auto_dockerfile_build(docker_client_with_cleanup):
+    os.chdir(str(Path(__file__).parent.parent / "test-project"))
     try:
         result = build_docker_image(
             image_name="local/repo", tag="test", dockerfile="auto", push=False
@@ -206,10 +208,6 @@ def test_real_auto_dockerfile_build(docker_client_with_cleanup):
         cases = [
             {"command": "prefect version", "expected": prefect.__version__},
             {"command": "ls", "expected": "requirements.txt"},
-            {
-                "command": "python -c 'import docker; print(docker.__version__)'",
-                "expected": docker.__version__,
-            },
         ]
 
         for case in cases:
@@ -220,6 +218,17 @@ def test_real_auto_dockerfile_build(docker_client_with_cleanup):
                 remove=True,
             )
             assert case["expected"] in output.decode()
+
+        output = docker_client_with_cleanup.containers.run(
+            image=result["image"],
+            command="python -c 'import pandas; print(pandas.__version__)'",
+            labels=["prefect-docker-test"],
+            remove=True,
+        )
+        if sys.version_info >= (3, 8):
+            assert "2" in output.decode()
+        else:
+            assert "1" in output.decode()
 
     finally:
         docker_client_with_cleanup.containers.prune(

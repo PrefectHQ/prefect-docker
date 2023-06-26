@@ -156,7 +156,9 @@ def build_docker_image(
             lines.append(
                 f"COPY requirements.txt /opt/prefect/{dir_name}/requirements.txt"
             )
-            lines.append("RUN python -m pip install -r requirements.txt")
+            lines.append(
+                f"RUN python -m pip install -r /opt/prefect/{dir_name}/requirements.txt"
+            )
 
         lines.append(f"COPY . /opt/prefect/{dir_name}/")
         lines.append(f"WORKDIR /opt/prefect/{dir_name}/")

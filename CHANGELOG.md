@@ -19,6 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## 0.3.1
+
+Released June 26th, 2023.
+
+### Fixed
+
+- Fix requirements installation when using `build_docker_image` step with `dockerfile='auto'` - [#68](https://github.com/PrefectHQ/prefect-docker/pull/68)
+
 ## 0.3.0
 
 Released June 15th, 2023.
