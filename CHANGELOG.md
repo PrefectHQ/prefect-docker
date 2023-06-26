@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.3.1
 
-Released June 23rd, 2023.
+Released June 26th, 2023.
 
 ### Fixed
 
