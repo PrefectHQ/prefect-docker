@@ -17,7 +17,7 @@
         <link rel="next" href="../../worker/">
       
       <link rel="icon" href="../../img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.17">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.19">
     
     
       
@@ -25,7 +25,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.26e3688c.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.eebd395e.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ecc896b0.min.css">
@@ -554,7 +554,7 @@
 
 
 <h1 id="prefect_docker.deployments.steps" class="doc doc-heading">
-          <code>prefect_docker.deployments.steps</code>
+            <code>prefect_docker.deployments.steps</code>
 
 
 </h1>
@@ -599,18 +599,20 @@ the build step for a specific deployment.</p>
 
 
 <h3 id="prefect_docker.deployments.steps.BuildDockerImageResult" class="doc doc-heading">
-        <code>BuildDockerImageResult</code>
+          <code>BuildDockerImageResult</code>
 
 
 </h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
 
   
       <p>The result of a <code>build_docker_image</code> step.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -669,10 +671,9 @@ the build step for a specific deployment.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>prefect_docker/deployments/steps.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">45</span>
+            <details class="quote">
+              <summary>Source code in <code>prefect_docker/deployments/steps.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">45</span>
 <span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
@@ -702,7 +703,7 @@ the build step for a specific deployment.</p>
     <span class="n">image</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">image_id</span><span class="p">:</span> <span class="nb">str</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -729,18 +730,20 @@ the build step for a specific deployment.</p>
 
 
 <h3 id="prefect_docker.deployments.steps.PushDockerImageResult" class="doc doc-heading">
-        <code>PushDockerImageResult</code>
+          <code>PushDockerImageResult</code>
 
 
 </h3>
 
 
   <div class="doc doc-contents ">
-      <p class="doc doc-class-bases">
-        Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing_extensions.TypedDict">TypedDict</span></code></p>
 
   
       <p>The result of a <code>push_docker_image</code> step.</p>
+
+
 
   <p><strong>Attributes:</strong></p>
   <table>
@@ -788,10 +791,9 @@ the build step for a specific deployment.</p>
     </tbody>
   </table>
 
-
-        <details class="quote">
-          <summary>Source code in <code>prefect_docker/deployments/steps.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">62</span>
+            <details class="quote">
+              <summary>Source code in <code>prefect_docker/deployments/steps.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span>
@@ -817,7 +819,7 @@ the build step for a specific deployment.</p>
     <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">image</span><span class="p">:</span> <span class="nb">str</span>
 </code></pre></div></td></tr></table></div>
-        </details>
+            </details>
 
   
 
@@ -840,6 +842,7 @@ the build step for a specific deployment.</p>
 </div>
 <h2 id="prefect_docker.deployments.steps-functions">Functions</h2>
 
+
 <div class="doc doc-object doc-function">
 
 
@@ -855,6 +858,8 @@ the build step for a specific deployment.</p>
       <p>Builds a Docker image for a Prefect deployment.</p>
 <p>Can be used within a <code>prefect.yaml</code> file to build a Docker
 image prior to creating or updating a deployment.</p>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -958,6 +963,8 @@ documentation.</p>
     </tbody>
   </table>
 
+
+
   <p><strong>Returns:</strong></p>
   <table>
     <thead>
@@ -1010,9 +1017,9 @@ built image.</p>
 <span class="w">        </span><span class="nt">platform</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">amd64</span>
 </code></pre></div></p>
 </details>
-      <details class="quote">
-        <summary>Source code in <code>prefect_docker/deployments/steps.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 77</span>
+          <details class="quote">
+            <summary>Source code in <code>prefect_docker/deployments/steps.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 77</span>
 <span class="normal"> 78</span>
 <span class="normal"> 79</span>
 <span class="normal"> 80</span>
@@ -1344,10 +1351,11 @@ built image.</p>
         <span class="s2">&quot;image_id&quot;</span><span class="p">:</span> <span class="n">image_id</span><span class="p">,</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
+
 
 <div class="doc doc-object doc-function">
 
@@ -1362,6 +1370,8 @@ built image.</p>
   <div class="doc doc-contents ">
   
       <p>Push a Docker image to a remote registry.</p>
+
+
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -1421,6 +1431,8 @@ registry to push the image to.</p>
     </tbody>
   </table>
 
+
+
   <p><strong>Returns:</strong></p>
   <table>
     <thead>
@@ -1444,6 +1456,8 @@ pushed image.</p>
     </tbody>
   </table>
 
+
+
 <p><strong>Examples:</strong></p>
     <p>Build and push a Docker image to a private repository:
 <div class="highlight"><pre><span></span><code><span class="nt">build</span><span class="p">:</span>
@@ -1462,9 +1476,9 @@ pushed image.</p>
 <span class="w">        </span><span class="nt">credentials</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;{{</span><span class="nv"> </span><span class="s">prefect.blocks.docker-registry-credentials.dev-registry</span><span class="nv"> </span><span class="s">}}&quot;</span>
 </code></pre></div></p>
 
-      <details class="quote">
-        <summary>Source code in <code>prefect_docker/deployments/steps.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">245</span>
+          <details class="quote">
+            <summary>Source code in <code>prefect_docker/deployments/steps.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">245</span>
 <span class="normal">246</span>
 <span class="normal">247</span>
 <span class="normal">248</span>
@@ -1588,7 +1602,7 @@ pushed image.</p>
         <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">image_name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
     <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
-      </details>
+          </details>
   </div>
 
 </div>
@@ -1742,10 +1756,10 @@ pushed image.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.b425cdc4.min.js"></script>
+      <script src="../../assets/javascripts/bundle.220ee61c.min.js"></script>
       
     
   </body>
