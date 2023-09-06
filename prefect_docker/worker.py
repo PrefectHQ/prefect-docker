@@ -91,6 +91,7 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
             allowing the container to use as much swap as memory. For example, if
             `mem_limit` is 300m and `memswap_limit` is not set, containers can use
             600m in total of memory and swap.
+        extra_args: Extra args for docker py when creating container.
         privileged: Give extended privileges to created containers.
     """
 
@@ -149,6 +150,14 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
             "allowing the container to use as much swap as memory. For example, if "
             "`mem_limit` is 300m and `memswap_limit` is not set, containers can use "
             "600m in total of memory and swap."
+        ),
+    )
+
+    extra_args: Optional[Dict[str,Any]] = Field(
+        default=None,
+        title="Extra args",
+        description=(
+            "Extra args for dockerpy containers.create"
         ),
     )
 
@@ -509,6 +518,7 @@ class DockerWorker(BaseWorker):
     ) -> Dict:
         """Builds a dictionary of container settings to pass to the Docker API."""
         network_mode = configuration.get_network_mode()
+        extra_args = configuration.extra_args if configuration.extra_args else {}
         return dict(
             image=configuration.image,
             network=configuration.networks[0] if configuration.networks else None,
@@ -523,6 +533,7 @@ class DockerWorker(BaseWorker):
             mem_limit=configuration.mem_limit,
             memswap_limit=configuration.memswap_limit,
             privileged=configuration.privileged,
+            **extra_args
         )
 
     def _create_and_start_container(
