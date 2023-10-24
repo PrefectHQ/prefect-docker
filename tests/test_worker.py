@@ -356,7 +356,7 @@ async def test_uses_env_setting(
     call_env = mock_docker_client.containers.create.call_args[1].get("environment")
     assert call_env == {
         **get_current_settings().to_environment_variables(exclude_unset=True),
-        "PREFECT__FLOW_RUN_ID": flow_run.id.hex,
+        "PREFECT__FLOW_RUN_ID": str(flow_run.id),
         "foo": "FOO",
         "bar": "BAR",
     }
