@@ -1,8 +1,9 @@
 import os
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock
 from unittest import mock
+from unittest.mock import MagicMock
+
 import docker
 import docker.errors
 import docker.models.containers

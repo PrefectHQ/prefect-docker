@@ -26,7 +26,7 @@ the build step for a specific deployment.
 import os
 import sys
 from pathlib import Path
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional
 
 import docker.errors
 import pendulum
