@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+from unittest import mock
 from unittest.mock import MagicMock
 
 import docker
@@ -19,6 +20,7 @@ FAKE_BASE_URL = "http+docker://my-url"
 FAKE_DEFAULT_TAG = "2022-08-31t18-01-32-00-00"
 FAKE_IMAGE_NAME = "registry/repo"
 FAKE_TAG = "mytag"
+FAKE_ADDITIONAL_TAGS = ["addtag1", "addtag2"]
 FAKE_EVENT = [{"status": "status", "progress": "progress"}, {"status": "status"}]
 FAKE_CREDENTIALS = {
     "username": "user",
@@ -127,6 +129,14 @@ def mock_pendulum(monkeypatch):
             },
             f"registry/repo:{FAKE_DEFAULT_TAG}",
         ),
+        (
+            {
+                "image_name": "registry/repo",
+                "tag": "mytag",
+                "additional_tags": FAKE_ADDITIONAL_TAGS,
+            },
+            "registry/repo:mytag",
+        ),
     ],
 )
 def test_build_docker_image(
@@ -142,6 +152,7 @@ def test_build_docker_image(
     tag = kwargs.get("tag", FAKE_DEFAULT_TAG)
     push = kwargs.get("push", False)
     credentials = kwargs.get("credentials", None)
+    additional_tags = kwargs.get("additional_tags", None)
     result = build_docker_image(**kwargs)
 
     assert result["image"] == expected_image
@@ -149,14 +160,26 @@ def test_build_docker_image(
     assert result["image_name"] == image_name
     assert result["image_id"] == FAKE_CONTAINER_ID
 
+    if additional_tags:
+        assert result["additional_tags"] == FAKE_ADDITIONAL_TAGS
+        mock_docker_client.images.get.return_value.tag.assert_has_calls(
+            [
+                mock.call(repository=image_name, tag=tag),
+                mock.call(repository=image_name, tag=FAKE_ADDITIONAL_TAGS[0]),
+                mock.call(repository=image_name, tag=FAKE_ADDITIONAL_TAGS[1]),
+            ]
+        )
+    else:
+        assert result["additional_tags"] == []
+        mock_docker_client.images.get.return_value.tag.assert_called_once_with(
+            repository=image_name, tag=tag
+        )
+
     if dockerfile == "auto":
         auto_build = True
         dockerfile = "Dockerfile"
 
     mock_docker_client.images.get.assert_called_once_with(FAKE_CONTAINER_ID)
-    mock_docker_client.images.get.return_value.tag.assert_called_once_with(
-        repository=image_name, tag=tag
-    )
     if push:
         mock_docker_client.api.push.assert_called_once_with(
             repository=image_name,
@@ -239,6 +262,50 @@ def test_real_auto_dockerfile_build(docker_client_with_cleanup):
             docker_client_with_cleanup.images.remove(
                 image="local/repo:test", force=True
             )
+
+
+def test_push_docker_image_with_additional_tags(mock_docker_client, monkeypatch):
+    # Mock stdout
+    mock_stdout = MagicMock()
+    monkeypatch.setattr(sys, "stdout", mock_stdout)
+
+    mock_docker_client.api.push.return_value = FAKE_EVENT
+
+    result = push_docker_image(
+        image_name=FAKE_IMAGE_NAME,
+        tag=FAKE_TAG,
+        credentials=FAKE_CREDENTIALS,
+        additional_tags=FAKE_ADDITIONAL_TAGS,
+    )
+
+    assert result["image_name"] == FAKE_IMAGE_NAME
+    assert result["tag"] == FAKE_TAG
+    assert result["image"] == f"{FAKE_IMAGE_NAME}:{FAKE_TAG}"
+    assert result["additional_tags"] == FAKE_ADDITIONAL_TAGS
+
+    mock_docker_client.api.push.assert_has_calls(
+        [
+            mock.call(
+                repository=FAKE_IMAGE_NAME,
+                tag=FAKE_TAG,
+                stream=True,
+                decode=True,
+            ),
+            mock.call(
+                repository=FAKE_IMAGE_NAME,
+                tag=FAKE_ADDITIONAL_TAGS[0],
+                stream=True,
+                decode=True,
+            ),
+            mock.call(
+                repository=FAKE_IMAGE_NAME,
+                tag=FAKE_ADDITIONAL_TAGS[1],
+                stream=True,
+                decode=True,
+            ),
+        ]
+    )
+    assert mock_stdout.write.call_count == 15
 
 
 def test_push_docker_image_with_credentials(mock_docker_client, monkeypatch):

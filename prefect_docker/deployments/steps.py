@@ -26,7 +26,7 @@ the build step for a specific deployment.
 import os
 import sys
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import docker.errors
 import pendulum
@@ -51,12 +51,14 @@ class BuildDockerImageResult(TypedDict):
         tag: The tag of the built image.
         image: The name and tag of the built image.
         image_id: The ID of the built image.
+        additional_tags: The additional tags on the image, in addition to `tag`.
     """
 
     image_name: str
     tag: str
     image: str
     image_id: str
+    additional_tags: Optional[str]
 
 
 class PushDockerImageResult(TypedDict):
@@ -67,11 +69,13 @@ class PushDockerImageResult(TypedDict):
         image_name: The name of the pushed image.
         tag: The tag of the pushed image.
         image: The name and tag of the pushed image.
+        additional_tags: The additional tags on the image, in addition to `tag`.
     """
 
     image_name: str
     tag: str
     image: str
+    additional_tags: Optional[str]
 
 
 @deprecated_parameter(
@@ -86,6 +90,7 @@ def build_docker_image(
     tag: Optional[str] = None,
     push: bool = False,
     credentials: Optional[Dict] = None,
+    additional_tags: Optional[List[str]] = None,
     **build_kwargs,
 ) -> BuildDockerImageResult:
     """
@@ -103,6 +108,7 @@ def build_docker_image(
         push: DEPRECATED: Whether to push the built image to the registry.
         credentials: A dictionary containing the username, password, and URL for the
             registry to push the image to.
+        additional_tags: Additional tags on the image, in addition to `tag`, to apply to the built image.
         **build_kwargs: Additional keyword arguments to pass to Docker when building
             the image. Available options can be found in the [`docker-py`](https://docker-py.readthedocs.io/en/stable/images.html#docker.models.images.ImageCollection.build)
             documentation.
@@ -119,6 +125,19 @@ def build_docker_image(
                 requires: prefect-docker
                 image_name: repo-name/image-name
                 tag: dev
+        ```
+
+        Build and push a Docker image with multiple tags:
+        ```yaml
+        build:
+            - prefect_docker.deployments.steps.build_docker_image:
+                requires: prefect-docker
+                image_name: repo-name/image-name
+                tag: dev
+                additional_tags: [
+                    v0.1.0,
+                    dac9ccccedaa55a17916eef14f95cc7bdd3c8199
+                ]
         ```
 
         Build a Docker image using an auto-generated Dockerfile:
@@ -210,6 +229,10 @@ def build_docker_image(
         image: Image = client.images.get(image_id)
         image.tag(repository=image_name, tag=tag)
 
+        additional_tags = additional_tags or []
+        for tag_ in additional_tags:
+            image.tag(repository=image_name, tag=tag_)
+
         if push:
             if credentials is not None:
                 client.login(
@@ -239,11 +262,15 @@ def build_docker_image(
         "tag": tag,
         "image": f"{image_name}:{tag}",
         "image_id": image_id,
+        "additional_tags": additional_tags,
     }
 
 
 def push_docker_image(
-    image_name: str, tag: Optional[str] = None, credentials: Optional[Dict] = None
+    image_name: str,
+    tag: Optional[str] = None,
+    credentials: Optional[Dict] = None,
+    additional_tags: Optional[List[str]] = None,
 ) -> PushDockerImageResult:
     """
     Push a Docker image to a remote registry.
@@ -254,6 +281,7 @@ def push_docker_image(
         tag: The tag of the Docker image to push.
         credentials: A dictionary containing the username, password, and URL for the
             registry to push the image to.
+        additional_tags: Additional tags on the image, in addition to `tag`, to apply to the built image.
 
     Returns:
         A dictionary containing the image name and tag of the
@@ -277,6 +305,29 @@ def push_docker_image(
                 tag: "{{ build-image.tag }}"
                 credentials: "{{ prefect.blocks.docker-registry-credentials.dev-registry }}"
         ```
+
+        Build and push a Docker image to a private repository with multiple tags
+        ```yaml
+        build:
+            - prefect_docker.deployments.steps.build_docker_image:
+                id: build-image
+                requires: prefect-docker
+                image_name: repo-name/image-name
+                tag: dev
+                dockerfile: auto
+                additional_tags: [
+                    v0.1.0,
+                    dac9ccccedaa55a17916eef14f95cc7bdd3c8199
+                ]
+
+        push:
+            - prefect_docker.deployments.steps.push_docker_image:
+                requires: prefect-docker
+                image_name: "{{ build-image.image_name }}"
+                tag: "{{ build-image.tag }}"
+                credentials: "{{ prefect.blocks.docker-registry-credentials.dev-registry }}"
+                additional_tags: "{{ build-image.additional_tags }}"
+        ```
     """  # noqa
     with docker_client() as client:
         if credentials is not None:
@@ -289,6 +340,13 @@ def push_docker_image(
         events = client.api.push(
             repository=image_name, tag=tag, stream=True, decode=True
         )
+        additional_tags = additional_tags or []
+        for i, tag_ in enumerate(additional_tags):
+            event = client.api.push(
+                repository=image_name, tag=tag_, stream=True, decode=True
+            )
+            events = events + event
+
         for event in events:
             if "status" in event:
                 sys.stdout.write(event["status"])
@@ -303,4 +361,5 @@ def push_docker_image(
         "image_name": image_name,
         "tag": tag,
         "image": f"{image_name}:{tag}",
+        "additional_tags": additional_tags,
     }
