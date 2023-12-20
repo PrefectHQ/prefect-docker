@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## 0.3.3
+
+### Added
+- allow multiple Docker tags for build and push steps
+
 ## 0.3.2
 
 Released July 20th, 2023.
