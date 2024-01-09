@@ -134,10 +134,9 @@ def build_docker_image(
                 requires: prefect-docker
                 image_name: repo-name/image-name
                 tag: dev
-                additional_tags: [
-                    v0.1.0,
-                    dac9ccccedaa55a17916eef14f95cc7bdd3c8199
-                ]
+                additional_tags:
+                    - v0.1.0,
+                    - dac9ccccedaa55a17916eef14f95cc7bdd3c8199
         ```
 
         Build a Docker image using an auto-generated Dockerfile:
