@@ -19,7 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-## 0.3.3
+## 0.4.3
+
+### Added
+- fix for multiple Docker tags
+
+## 0.4.2
 
 ### Added
 - allow multiple Docker tags for build and push steps
