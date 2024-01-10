@@ -336,13 +336,15 @@ def push_docker_image(
                 registry=credentials.get("registry_url"),
                 reauth=credentials.get("reauth", True),
             )
-        events = client.api.push(
-            repository=image_name, tag=tag, stream=True, decode=True
+        events = list(
+            client.api.push(repository=image_name, tag=tag, stream=True, decode=True)
         )
         additional_tags = additional_tags or []
         for i, tag_ in enumerate(additional_tags):
-            event = client.api.push(
-                repository=image_name, tag=tag_, stream=True, decode=True
+            event = list(
+                client.api.push(
+                    repository=image_name, tag=tag_, stream=True, decode=True
+                )
             )
             events = events + event
 
