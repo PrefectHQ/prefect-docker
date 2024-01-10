@@ -134,10 +134,9 @@ def build_docker_image(
                 requires: prefect-docker
                 image_name: repo-name/image-name
                 tag: dev
-                additional_tags: [
-                    v0.1.0,
-                    dac9ccccedaa55a17916eef14f95cc7bdd3c8199
-                ]
+                additional_tags:
+                    - v0.1.0,
+                    - dac9ccccedaa55a17916eef14f95cc7bdd3c8199
         ```
 
         Build a Docker image using an auto-generated Dockerfile:
@@ -337,13 +336,15 @@ def push_docker_image(
                 registry=credentials.get("registry_url"),
                 reauth=credentials.get("reauth", True),
             )
-        events = client.api.push(
-            repository=image_name, tag=tag, stream=True, decode=True
+        events = list(
+            client.api.push(repository=image_name, tag=tag, stream=True, decode=True)
         )
         additional_tags = additional_tags or []
         for i, tag_ in enumerate(additional_tags):
-            event = client.api.push(
-                repository=image_name, tag=tag_, stream=True, decode=True
+            event = list(
+                client.api.push(
+                    repository=image_name, tag=tag_, stream=True, decode=True
+                )
             )
             events = events + event
 

@@ -269,7 +269,14 @@ def test_push_docker_image_with_additional_tags(mock_docker_client, monkeypatch)
     mock_stdout = MagicMock()
     monkeypatch.setattr(sys, "stdout", mock_stdout)
 
-    mock_docker_client.api.push.return_value = FAKE_EVENT
+    # client.api.push can return a generator or strings; here we test with a generator
+    # we end up calling client.api.push 3 times in this test (once for tag, twice for
+    # additional_tags), therefore we need the mocked push to return 3 generators
+    mock_docker_client.api.push.side_effect = [
+        (e for e in FAKE_EVENT),
+        (e for e in FAKE_EVENT),
+        (e for e in FAKE_EVENT),
+    ]
 
     result = push_docker_image(
         image_name=FAKE_IMAGE_NAME,
