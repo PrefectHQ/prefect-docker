@@ -46,7 +46,7 @@ class DockerRegistryCredentials(Block):
         description=(
             'The URL to the registry. Generally, "http" or "https" can be omitted.'
         ),
-        example="registry.hub.docker.com",
+        example="index.docker.io",
     )
     reauth: bool = Field(
         default=True,
