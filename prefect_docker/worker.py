@@ -394,7 +394,10 @@ class DockerWorker(BaseWorker):
             self._client = get_client()
             if self._client.server_type == ServerType.EPHEMERAL:
                 raise RuntimeError(
-                    "Docker worker cannot be used with an ephemeral server."
+                    "Docker worker cannot be used with an ephemeral server. Please set"
+                    " PREFECT_API_URL to the URL for your Prefect API instance. You"
+                    " can use a local Prefect API instance by running `prefect server"
+                    " start`."
                 )
 
         return await super().setup()
