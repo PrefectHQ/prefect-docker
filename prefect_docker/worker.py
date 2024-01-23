@@ -544,7 +544,13 @@ class DockerWorker(BaseWorker):
         """Creates and starts a Docker container."""
         docker_client = self._get_client()
         if configuration.registry_credentials:
-            configuration.registry_credentials.login(docker_client)
+            self._logger.info("Logging into Docker registry...")
+            docker_client.login(
+                username=configuration.registry_credentials.username,
+                password=configuration.registry_credentials.password.get_secret_value(),
+                registry=configuration.registry_credentials.registry_url,
+                reauth=configuration.registry_credentials.reauth,
+            )
         container_settings = self._build_container_settings(
             docker_client, configuration
         )

@@ -24,6 +24,7 @@ from prefect.settings import (
 )
 from prefect.testing.utilities import assert_does_not_warn
 
+from prefect_docker.credentials import DockerRegistryCredentials
 from prefect_docker.worker import (
     CONTAINER_LABELS,
     DockerWorker,
@@ -108,6 +109,17 @@ def default_docker_worker_job_configuration():
 @pytest.fixture
 def flow_run():
     return FlowRun(flow_id=uuid.uuid4())
+
+
+@pytest.fixture
+def registry_credentials():
+    block = DockerRegistryCredentials(
+        username="my_username",
+        password="my_password",
+        registry_url="registry.hub.docker.com",
+    )
+    block.save(name="test", overwrite=True)
+    return block
 
 
 @pytest.mark.parametrize(
@@ -225,6 +237,25 @@ async def test_uses_image_setting(
     mock_docker_client.containers.create.assert_called_once()
     call_image = mock_docker_client.containers.create.call_args[1].get("image")
     assert call_image == "foo"
+
+
+async def test_uses_credentials(
+    mock_docker_client,
+    flow_run,
+    default_docker_worker_job_configuration,
+    registry_credentials,
+):
+    default_docker_worker_job_configuration.registry_credentials = registry_credentials
+    async with DockerWorker(work_pool_name="test") as worker:
+        await worker.run(
+            flow_run=flow_run, configuration=default_docker_worker_job_configuration
+        )
+    mock_docker_client.login.assert_called_once_with(
+        username="my_username",
+        password="my_password",
+        registry="registry.hub.docker.com",
+        reauth=True,
+    )
 
 
 async def test_uses_volumes_setting(
