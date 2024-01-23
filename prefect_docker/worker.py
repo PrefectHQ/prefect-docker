@@ -44,6 +44,8 @@ from prefect.utilities.dockerutils import (
 from prefect.workers.base import BaseJobConfiguration, BaseWorker, BaseWorkerResult
 from pydantic import VERSION as PYDANTIC_VERSION
 
+from prefect_docker.credentials import DockerRegistryCredentials
+
 if PYDANTIC_VERSION.startswith("2."):
     from pydantic.v1 import Field, validator
 else:
@@ -105,6 +107,11 @@ class DockerWorkerJobConfiguration(BaseJobConfiguration):
         description="The image reference of a container image to use for created jobs. "
         "If not set, the latest Prefect image will be used.",
         example="docker.io/prefecthq/prefect:2-latest",
+    )
+    registry_credentials: Optional[DockerRegistryCredentials] = Field(
+        default=None,
+        description="Credentials for logging into a Docker registry to pull"
+        " images from.",
     )
     image_pull_policy: Optional[Literal["IfNotPresent", "Always", "Never"]] = Field(
         default=None,
@@ -536,6 +543,8 @@ class DockerWorker(BaseWorker):
     ) -> Tuple["Container", Event]:
         """Creates and starts a Docker container."""
         docker_client = self._get_client()
+        if configuration.registry_credentials:
+            configuration.registry_credentials.login(docker_client)
         container_settings = self._build_container_settings(
             docker_client, configuration
         )
@@ -700,7 +709,6 @@ class DockerWorker(BaseWorker):
         name = original_name = kwargs.pop("name")
 
         while not container:
-
             try:
                 display_name = repr(name) if name else "with auto-generated name"
                 self._logger.info(f"Creating Docker container {display_name}...")
