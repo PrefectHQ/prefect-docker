@@ -112,13 +112,13 @@ def flow_run():
 
 
 @pytest.fixture
-def registry_credentials():
+async def registry_credentials():
     block = DockerRegistryCredentials(
         username="my_username",
         password="my_password",
         registry_url="registry.hub.docker.com",
     )
-    block.save(name="test", overwrite=True)
+    await block.save(name="test", overwrite=True)
     return block
 
 
