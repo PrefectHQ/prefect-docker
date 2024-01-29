@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Improved error message when running Docker worker against an ephemeral API - [#96](https://github.com/PrefectHQ/prefect-docker/pull/96)
+
 ### Deprecated
 
 ### Removed
@@ -18,6 +20,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## 0.4.4
+
+Released January 23rd, 2023.
+
+- Adds registry credentials support to Docker worker - [#102](https://github.com/PrefectHQ/prefect-docker/pull/102)
+
+## 0.4.3
+
+### Added
+
+Released January 10th, 2023.
+
+- Fix for multiple Docker tags - [#101](https://github.com/PrefectHQ/prefect-docker/pull/101)
+
+## 0.4.2
+
+### Added
+
+Released January 8th, 2023.
+
+- Allow multiple Docker tags for build and push steps - [#97](https://github.com/PrefectHQ/prefect-docker/pull/97)
 
 ## 0.3.2
 

@@ -12,12 +12,14 @@ jobs:
           - "3.8"
           - "3.9"
           - "3.10"
+          - "3.11"
+          - "3.12"
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -32,4 +34,4 @@ jobs:
         env:
           PREFECT_API_DATABASE_CONNECTION_URL: "sqlite+aiosqlite:///./prefect-tests.db"
         run: |
-          pytest tests -vvv --numprocesses 4 --dist loadscope --cov=prefect_docker/ --cov=tests/ --no-cov-on-fail
+          pytest tests -vvv --numprocesses auto --dist loadscope --cov=prefect_docker/ --cov=tests/ --no-cov-on-fail
