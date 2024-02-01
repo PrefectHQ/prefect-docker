@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Improved error message when running Docker worker against an ephemeral API - [#96](https://github.com/PrefectHQ/prefect-docker/pull/96)
+- Update branding and links
 
 ### Deprecated
 
