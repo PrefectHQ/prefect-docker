@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="img/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.6">
     
     
       
@@ -102,7 +102,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="." title="prefect-docker" class="md-header__button md-logo" aria-label="prefect-docker" data-md-component="logo">
       
-  <img src="img/prefect-logo-mark-solid-white-500.png" alt="logo">
+  <img src="img/prefect-logo-mark.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -208,7 +208,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="." title="prefect-docker" class="md-nav__button md-logo" aria-label="prefect-docker" data-md-component="logo">
       
-  <img src="img/prefect-logo-mark-solid-white-500.png" alt="logo">
+  <img src="img/prefect-logo-mark.png" alt="logo">
 
     </a>
     prefect-docker
@@ -656,18 +656,17 @@
 <h1 id="prefect-docker">prefect-docker</h1>
 <p align="center">
     <a href="https://pypi.python.org/pypi/prefect-docker/" alt="PyPI version">
-        <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-docker?color=0052FF&labelColor=090422"></a>
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/prefect-docker?color=26272B&labelColor=090422"></a>
     <a href="https://github.com/PrefectHQ/prefect-docker/" alt="Stars">
-        <img src="https://img.shields.io/github/stars/PrefectHQ/prefect-docker?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/github/stars/PrefectHQ/prefect-docker?color=26272B&labelColor=090422" /></a>
     <a href="https://pepy.tech/badge/prefect-docker/" alt="Downloads">
-        <img src="https://img.shields.io/pypi/dm/prefect-docker?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/pypi/dm/prefect-docker?color=26272B&labelColor=090422" /></a>
     <a href="https://github.com/PrefectHQ/prefect-docker/pulse" alt="Activity">
-        <img src="https://img.shields.io/github/commit-activity/m/PrefectHQ/prefect-docker?color=0052FF&labelColor=090422" /></a>
+        <img src="https://img.shields.io/github/commit-activity/m/PrefectHQ/prefect-docker?color=26272B&labelColor=090422" /></a>
     <br>
     <a href="https://prefect-community.slack.com" alt="Slack">
-        <img src="https://img.shields.io/badge/slack-join_community-red.svg?color=0052FF&labelColor=090422&logo=slack" /></a>
-    <a href="https://discourse.prefect.io/" alt="Discourse">
-        <img src="https://img.shields.io/badge/discourse-browse_forum-red.svg?color=0052FF&labelColor=090422&logo=discourse" /></a>
+        <img src="https://img.shields.io/badge/slack-join_community-red.svg?color=26272B&labelColor=090422&logo=slack" /></a>
+
 </p>
 
 <h2 id="welcome">Welcome!</h2>
@@ -676,17 +675,17 @@
 <p>Do not use <code>DockerRegistry</code> with this collection. Instead, use <code>DockerHost</code> and <code>DockerRegistryCredentials</code>.</p>
 <h2 id="getting-started">Getting Started</h2>
 <h3 id="python-setup">Python setup</h3>
-<p>Requires an installation of Python 3.7+.</p>
-<p>We recommend using a Python virtual environment manager such as pipenv, conda or virtualenv.</p>
-<p>These tasks are designed to work with Prefect 2.0. For more information about how to use Prefect, please refer to the <a href="https://orion-docs.prefect.io/">Prefect documentation</a>.</p>
+<p>Requires an installation of Python 3.8+.</p>
+<p>We recommend using a Python virtual environment manager such as pipenv, conda, or virtualenv.</p>
+<p>These tasks are designed to work with Prefect 2. For more information about how to use Prefect, please refer to the <a href="https://docs.prefect.io/">Prefect documentation</a>.</p>
 <h3 id="installation">Installation</h3>
 <p>Install <code>prefect-docker</code> with <code>pip</code>:</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>prefect-docker
 </code></pre></div>
-<p>Then, register to <a href="https://orion-docs.prefect.io/ui/blocks/">view the block</a> on Prefect Cloud:</p>
+<p>Then, register to <a href="https://docs.prefect.io/concepts/blocks/">view the block</a> on Prefect Cloud:</p>
 <div class="highlight"><pre><span></span><code>prefect<span class="w"> </span>block<span class="w"> </span>register<span class="w"> </span>-m<span class="w"> </span>prefect_docker
 </code></pre></div>
-<p>Note, to use the <code>load</code> method on Blocks, you must already have a block document <a href="https://orion-docs.prefect.io/concepts/blocks/#saving-blocks">saved through code</a> or <a href="https://orion-docs.prefect.io/ui/blocks/">saved through the UI</a>.</p>
+<p>Note, to use the <code>load</code> method on Blocks, you must already have a block document <a href="https://docs.prefect.io/concepts/blocks/#saving-blocks">saved through code</a> or saved through the UI.</p>
 <h3 id="pull-image-and-create-start-log-stop-and-remove-docker-container">Pull image, and create, start, log, stop, and remove Docker container</h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">flow</span><span class="p">,</span> <span class="n">get_run_logger</span>
 <span class="kn">from</span> <span class="nn">prefect_docker.images</span> <span class="kn">import</span> <span class="n">pull_docker_image</span>
@@ -734,7 +733,7 @@
 </code></pre></div>
 <h2 id="resources">Resources</h2>
 <p>If you encounter any bugs while using <code>prefect-docker</code>, feel free to open an issue in the <a href="https://github.com/PrefectHQ/prefect-docker">prefect-docker</a> repository.</p>
-<p>If you have any questions or issues while using <code>prefect-docker</code>, you can find help in either the <a href="https://discourse.prefect.io/">Prefect Discourse forum</a> or the <a href="https://prefect.io/slack">Prefect Slack community</a>.</p>
+<p>If you have any questions or issues while using <code>prefect-docker</code>, you can find help in the <a href="https://prefect.io/slack">Prefect Slack community</a>.</p>
 <p>Feel free to ⭐️ or watch <a href="https://github.com/PrefectHQ/prefect-docker"><code>prefect-docker</code></a> for updates too!</p>
 <h2 id="development">Development</h2>
 <p>If you'd like to install a version of <code>prefect-docker</code> for development, clone the repository and perform an editable install with <code>pip</code>:</p>
@@ -898,10 +897,10 @@ pre-commit<span class="w"> </span>install
     </div>
     
     
-    <script id="__config" type="application/json">{"base": ".", "features": [], "search": "assets/javascripts/workers/search.c011b7c0.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": [], "search": "assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.7389ff0e.min.js"></script>
+      <script src="assets/javascripts/bundle.e1c3ead8.min.js"></script>
       
     
   </body>
