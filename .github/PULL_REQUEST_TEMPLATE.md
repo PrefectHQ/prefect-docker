@@ -29,4 +29,3 @@ A code blurb is best. Changes to features should include an example that is exec
 - [ ] This pull request references any related issue by including "Closes #<ISSUE_NUMBER>"
 	- If no issue exists and your change is not a small fix, please [create an issue](https://github.com/PrefectHQ/prefect-docker/issues/new/choose) first.
 - [ ] This pull request includes tests or only affects documentation.
-- [ ] Summarized PR's changes in [CHANGELOG.md](https://github.com/PrefectHQ/prefect-docker/blob/main/CHANGELOG.md)
