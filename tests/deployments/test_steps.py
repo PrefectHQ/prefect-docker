@@ -11,7 +11,6 @@ import docker.models.images
 import pendulum
 import prefect
 import prefect.utilities.dockerutils
-
 import pytest
 
 from prefect_docker.deployments.steps import build_docker_image, push_docker_image
