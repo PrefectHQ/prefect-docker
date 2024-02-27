@@ -169,7 +169,7 @@ def test_build_docker_image(
     push = kwargs.get("push", False)
     credentials = kwargs.get("credentials", None)
     additional_tags = kwargs.get("additional_tags", None)
-    path=kwargs.get("path", os.getcwd())
+    path = kwargs.get("path", os.getcwd())
     result = build_docker_image(**kwargs)
 
     assert result["image"] == expected_image
@@ -201,7 +201,7 @@ def test_build_docker_image(
         dockerfile=dockerfile,
         decode=True,
         pull=True,
-        labels=prefect.utilities.dockerutils.IMAGE_LABELS
+        labels=prefect.utilities.dockerutils.IMAGE_LABELS,
     )
 
     mock_docker_client.images.get.assert_called_once_with(FAKE_CONTAINER_ID)
