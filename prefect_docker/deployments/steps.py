@@ -190,7 +190,7 @@ def build_docker_image(
 
         dockerfile = str(temp_dockerfile)
 
-    build_kwargs["path"] = os.getcwd()
+    build_kwargs["path"] = build_kwargs.get("path", os.getcwd())
     build_kwargs["dockerfile"] = dockerfile
     build_kwargs["pull"] = build_kwargs.get("pull", True)
     build_kwargs["decode"] = True

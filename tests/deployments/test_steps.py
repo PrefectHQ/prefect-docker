@@ -132,6 +132,21 @@ def mock_pendulum(monkeypatch):
         (
             {
                 "image_name": "registry/repo",
+                "dockerfile": "auto",
+                "push": True,
+                "credentials": {
+                    "username": "user",
+                    "password": "pass",
+                    "registry_url": "https://registry.com",
+                    "reauth": True,
+                },
+                "path": "path/to/context",
+            },
+            f"registry/repo:{FAKE_DEFAULT_TAG}",
+        ),
+        (
+            {
+                "image_name": "registry/repo",
                 "tag": "mytag",
                 "additional_tags": FAKE_ADDITIONAL_TAGS,
             },
@@ -153,6 +168,7 @@ def test_build_docker_image(
     push = kwargs.get("push", False)
     credentials = kwargs.get("credentials", None)
     additional_tags = kwargs.get("additional_tags", None)
+    path = kwargs.get("path", os.getcwd())
     result = build_docker_image(**kwargs)
 
     assert result["image"] == expected_image
@@ -178,6 +194,14 @@ def test_build_docker_image(
     if dockerfile == "auto":
         auto_build = True
         dockerfile = "Dockerfile"
+
+    mock_docker_client.api.build.assert_called_once_with(
+        path=path,
+        dockerfile=dockerfile,
+        decode=True,
+        pull=True,
+        labels=prefect.utilities.dockerutils.IMAGE_LABELS,
+    )
 
     mock_docker_client.images.get.assert_called_once_with(FAKE_CONTAINER_ID)
     if push:
