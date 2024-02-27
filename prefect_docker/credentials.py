@@ -3,7 +3,12 @@ import docker
 from prefect import get_run_logger
 from prefect.blocks.core import Block
 from prefect.utilities.asyncutils import run_sync_in_worker_thread
-from pydantic import Field, SecretStr
+from pydantic import VERSION as PYDANTIC_VERSION
+
+if PYDANTIC_VERSION.startswith("2."):
+    from pydantic.v1 import Field, SecretStr
+else:
+    from pydantic import Field, SecretStr
 
 
 class DockerRegistryCredentials(Block):
@@ -27,7 +32,7 @@ class DockerRegistryCredentials(Block):
     """
 
     _block_type_name = "Docker Registry Credentials"
-    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250"  # noqa
+    _logo_url = "https://cdn.sanity.io/images/3ugk85nk/production/14a315b79990200db7341e42553e23650b34bb96-250x250.png"  # noqa
     _description = "Store credentials for interacting with a Docker Registry."
 
     username: str = Field(
@@ -41,7 +46,7 @@ class DockerRegistryCredentials(Block):
         description=(
             'The URL to the registry. Generally, "http" or "https" can be omitted.'
         ),
-        example="registry.hub.docker.com",
+        example="index.docker.io",
     )
     reauth: bool = Field(
         default=True,

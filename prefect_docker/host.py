@@ -4,7 +4,12 @@ from typing import Any, Dict, Optional
 import docker
 from prefect import get_run_logger
 from prefect.blocks.core import Block
-from pydantic import Field
+from pydantic import VERSION as PYDANTIC_VERSION
+
+if PYDANTIC_VERSION.startswith("2."):
+    from pydantic.v1 import Field
+else:
+    from pydantic import Field
 
 
 class _ContextManageableDockerClient(docker.DockerClient):
@@ -55,7 +60,7 @@ class DockerHost(Block):
     """
 
     _block_type_name = "Docker Host"
-    _logo_url = "https://images.ctfassets.net/gm98wzqotmnx/2IfXXfMq66mrzJBDFFCHTp/6d8f320d9e4fc4393f045673d61ab612/Moby-logo.png?h=250"  # noqa
+    _logo_url = "https://cdn.sanity.io/images/3ugk85nk/production/14a315b79990200db7341e42553e23650b34bb96-250x250.png"  # noqa
     _description = "Store settings for interacting with a Docker host."
 
     base_url: Optional[str] = Field(

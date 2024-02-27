@@ -7,9 +7,11 @@ import anyio.abc
 import docker
 import docker.errors
 import docker.models.containers
+import prefect
 import pytest
 from docker import DockerClient
 from docker.models.containers import Container
+from packaging import version
 from prefect.client.schemas import FlowRun
 from prefect.docker import get_prefect_image_name
 from prefect.events import RelatedResource
@@ -22,6 +24,7 @@ from prefect.settings import (
 )
 from prefect.testing.utilities import assert_does_not_warn
 
+from prefect_docker.credentials import DockerRegistryCredentials
 from prefect_docker.worker import (
     CONTAINER_LABELS,
     DockerWorker,
@@ -106,6 +109,17 @@ def default_docker_worker_job_configuration():
 @pytest.fixture
 def flow_run():
     return FlowRun(flow_id=uuid.uuid4())
+
+
+@pytest.fixture
+async def registry_credentials():
+    block = DockerRegistryCredentials(
+        username="my_username",
+        password="my_password",
+        registry_url="registry.hub.docker.com",
+    )
+    await block.save(name="test", overwrite=True)
+    return block
 
 
 @pytest.mark.parametrize(
@@ -223,6 +237,25 @@ async def test_uses_image_setting(
     mock_docker_client.containers.create.assert_called_once()
     call_image = mock_docker_client.containers.create.call_args[1].get("image")
     assert call_image == "foo"
+
+
+async def test_uses_credentials(
+    mock_docker_client,
+    flow_run,
+    default_docker_worker_job_configuration,
+    registry_credentials,
+):
+    default_docker_worker_job_configuration.registry_credentials = registry_credentials
+    async with DockerWorker(work_pool_name="test") as worker:
+        await worker.run(
+            flow_run=flow_run, configuration=default_docker_worker_job_configuration
+        )
+    mock_docker_client.login.assert_called_once_with(
+        username="my_username",
+        password="my_password",
+        registry="registry.hub.docker.com",
+        reauth=True,
+    )
 
 
 async def test_uses_volumes_setting(
@@ -354,9 +387,15 @@ async def test_uses_env_setting(
         )
     mock_docker_client.containers.create.assert_called_once()
     call_env = mock_docker_client.containers.create.call_args[1].get("environment")
+
+    flow_run_id = (
+        str(flow_run.id)
+        if version.parse(prefect.__version__) >= version.parse("2.13.5")
+        else flow_run.id.hex
+    )
     assert call_env == {
         **get_current_settings().to_environment_variables(exclude_unset=True),
-        "PREFECT__FLOW_RUN_ID": flow_run.id.hex,
+        "PREFECT__FLOW_RUN_ID": flow_run_id,
         "foo": "FOO",
         "bar": "BAR",
     }
@@ -1107,7 +1146,6 @@ async def test_kill_infrastructure_raises_infra_not_found_with_bad_container_id(
 async def test_emits_events(
     mock_docker_client, flow_run, default_docker_worker_job_configuration
 ):
-
     event_count = 0
 
     def event(*args, **kwargs):
