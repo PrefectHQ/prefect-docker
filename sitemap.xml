@@ -2,37 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://PrefectHQ.github.io/prefect-docker/</loc>
-         <lastmod>2024-02-01</lastmod>
+         <lastmod>2024-02-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-docker/containers/</loc>
-         <lastmod>2024-02-01</lastmod>
+         <lastmod>2024-02-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-docker/credentials/</loc>
-         <lastmod>2024-02-01</lastmod>
+         <lastmod>2024-02-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-docker/host/</loc>
-         <lastmod>2024-02-01</lastmod>
+         <lastmod>2024-02-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-docker/images/</loc>
-         <lastmod>2024-02-01</lastmod>
+         <lastmod>2024-02-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-docker/worker/</loc>
-         <lastmod>2024-02-01</lastmod>
+         <lastmod>2024-02-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://PrefectHQ.github.io/prefect-docker/deployments/steps/</loc>
-         <lastmod>2024-02-01</lastmod>
+         <lastmod>2024-02-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
